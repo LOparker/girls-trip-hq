@@ -490,7 +490,7 @@ function $f(n){return n?'$'+Math.round(n).toLocaleString('en-US'):'—'}
 function ts(){const d=new Date();return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' at '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}
 
 /* PEOPLE */
-function changePeople(delta){
+async function changePeople(delta){
   const next=Math.max(1,S.people+delta);
   if(next===S.people)return;
   const old=S.people;
