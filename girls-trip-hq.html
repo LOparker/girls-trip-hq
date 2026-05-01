@@ -391,12 +391,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="reveal">
         <p class="a-eye">Cast your vote</p>
         <h2 class="a-stitle">Which one are you feeling? 👇</h2>
-        <p class="a-ssub">Tap your fave — votes save automatically.</p>
+        <p class="a-ssub">Everyone's votes are live — tap your pick and see where the group lands.</p>
       </div>
       <div class="vote-grid reveal" id="vote-grid"></div>
+      <div id="vote-status" style="text-align:center;margin-top:1rem;font-size:13px;color:#6B5E85;font-style:italic"></div>
     </div>
   </section>
-
+  
   <div class="a-div"></div>
 
   <!-- ACTIVITIES -->
@@ -612,26 +613,67 @@ function clearEdit(){
 // close on Enter key in input
 document.getElementById('ep-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveEdit()});
 
-/* VOTES */
+
+/* VOTES — live via JSONBin */
+const BIN_ID='69f4efee36566621a814470b';
+const BIN_KEY='$2a$10$IZxrL2OiEANU06ryrmOwRucT6lVHGGQNe4d98lWxrFnQrY1Yr858G';
+const BIN_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
+let liveVotes={'1':0,'2':0,'3':0};
+
+async function fetchVotes(){
+  try{
+    const r=await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':BIN_KEY}});
+    const d=await r.json();
+    liveVotes=d.record.votes;
+    renderVotes();
+  }catch(e){console.log('fetch error',e)}
+}
+
+async function vote(id){
+  if(S.myVote===id)return;
+  document.getElementById('vote-status').textContent='Saving your vote...';
+  // undo previous vote
+  if(S.myVote)liveVotes[String(S.myVote]=Math.max(0,(liveVotes[String(S.myVote)]||1)-1);
+  liveVotes[String(id)]=(liveVotes[String(id)]||0)+1;
+  S.myVote=id;save();
+  try{
+    await fetch(BIN_URL,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':BIN_KEY},
+      body:JSON.stringify({votes:liveVotes})
+    });
+    document.getElementById('vote-status').textContent='Vote saved! ✓';
+    setTimeout(()=>document.getElementById('vote-status').textContent='',2000);
+  }catch(e){document.getElementById('vote-status').textContent='Could not save, try again'}
+  renderVotes();mini();
+}
+
 function renderVotes(){
   const g=document.getElementById('vote-grid');g.innerHTML='';
+  const total=Object.values(liveVotes).reduce((a,b)=>a+b,0);
   L.forEach(l=>{
-    const cnt=S.votes[l.id]||0,v=S.myVote===l.id;
+    const cnt=liveVotes[String(l.id)]||0;
+    const pct=total>0?Math.round((cnt/total)*100):0;
+    const v=S.myVote===l.id;
     const c=document.createElement('div');c.className='vcard'+(v?' voted':'');
     c.style.setProperty('--glow',l.glow);c.onclick=()=>vote(l.id);
-    c.innerHTML=`<div class="vbadge">${cnt} vote${cnt!==1?'s':''}</div>
+    c.innerHTML=`
+      <div class="vbadge">${cnt} vote${cnt!==1?'s':''}</div>
       <span class="vemoji">${l.emoji}</span>
       <div class="vname">${l.name.split(/[–-]/)[0].trim()}</div>
-      <div class="vtag">${v?'✓ Your pick':'Tap to vote'}</div>`;
+      <div class="vtag">${v?'✓ Your pick':'Tap to vote'}</div>
+      <div style="margin-top:10px;background:rgba(255,255,255,.07);border-radius:20px;height:6px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:#00E5C3;border-radius:20px;transition:width .5s ease"></div>
+      </div>
+      <div style="font-size:11px;color:#6B5E85;margin-top:4px">${pct}%</div>`;
     g.appendChild(c);
   });
 }
-function vote(id){
-  if(S.myVote===id)return;
-  if(S.myVote)S.votes[S.myVote]=Math.max(0,(S.votes[S.myVote]||1)-1);
-  S.myVote=id;S.votes[id]=(S.votes[id]||0)+1;
-  save();renderVotes();mini();
-}
+
+// fetch live votes on load
+fetchVotes();
+// refresh every 30 seconds
+setInterval(fetchVotes,30000);
 
 /* ACTIVITIES */
 function renderActs(){
@@ -689,7 +731,6 @@ document.querySelectorAll('#home-page .reveal').forEach(el=>ro.observe(el));
 load();
 document.getElementById('pp-display').textContent=S.people;
 renderCards();
-renderVotes();
 renderActs();
 renderLastUpdated();
 setTimeout(mini,700);
