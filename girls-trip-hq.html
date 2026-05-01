@@ -606,7 +606,7 @@ await saveBin();
   closeEdit();
   mini();
 }
-function clearEdit(){
+async function clearEdit(){
   if(editId===null)return;
   const l=L.find(x=>x.id===editId);
   if(S.prices[editId]){
