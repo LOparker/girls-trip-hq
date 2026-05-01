@@ -499,6 +499,8 @@ function changePeople(delta){
   S.changelog.unshift({type:'people',msg:`Headcount changed from ${old} to ${next} people`,time:ts()});
   if(S.changelog.length>20)S.changelog.pop();
   save();
+  livePeople=S.people;
+await saveBin();
   document.getElementById('pp-display').textContent=S.people;
   renderCards();
   renderLastUpdated();
@@ -519,7 +521,7 @@ function renderCards(){
   // update existing cards if possible, otherwise rebuild
   g.innerHTML='';
   L.forEach(l=>{
-    const t=S.prices[l.id]||null,pp=t?t/S.people:null,pn=t?t/N:null;
+    const t=livePrices[String(l.id)]||null,pp=t?t/livePeople:null,pn=t?t/N:null;
     const c=document.createElement('div');c.className='bnb-card';
     c.innerHTML=`
       <div class="bnb-thumb" style="background:${l.bg}">
@@ -589,8 +591,11 @@ function saveEdit(){
   if(isNaN(n)||n<=0){alert('Please enter a valid price.');return}
   const l=L.find(x=>x.id===editId);
   const old=S.prices[editId];
-  S.prices[editId]=n;
-  // log
+ const old=S.prices[editId];
+S.prices[editId]=n;
+livePrices[String(editId)]=n;
+await saveBin();
+// log
   const msg=old
     ? `${l.name.split(/[–-]/)[0].trim()} price updated from ${$f(old)} to ${$f(n)}`
     : `${l.name.split(/[–-]/)[0].trim()} price set to ${$f(n)}`;
@@ -609,6 +614,8 @@ function clearEdit(){
     S.changelog.unshift({type:'price',msg:`${l.name.split(/[–-]/)[0].trim()} price cleared`,time:ts()});
     if(S.changelog.length>20)S.changelog.pop();
     delete S.prices[editId];
+    delete livePrices[String(editId)];
+await saveBin();
     save();renderCards();renderLastUpdated();
   }
   closeEdit();
@@ -622,14 +629,31 @@ const BIN_ID='69f4efee36566621a814470b';
 const BIN_KEY='$2a$10$IZxrL2OiEANU06ryrmOwRucT6lVHGGQNe4d98lWxrFnQrY1Yr858G';
 const BIN_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
 let liveVotes={'1':0,'2':0,'3':0};
+let livePrices={};
+let livePeople=6;
 
 async function fetchVotes(){
   try{
     const r=await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':BIN_KEY}});
     const d=await r.json();
-    liveVotes=d.record.votes;
+    liveVotes=d.record.votes||{'1':0,'2':0,'3':0};
+    livePrices=d.record.prices||{};
+    livePeople=d.record.people||6;
+    S.people=livePeople;
+    document.getElementById('pp-display').textContent=S.people;
+    renderCards();
     renderVotes();
+    renderLastUpdated();
   }catch(e){console.log('fetch error',e)}
+}
+async function saveBin(){
+  try{
+    await fetch(BIN_URL,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':BIN_KEY},
+      body:JSON.stringify({votes:liveVotes,prices:livePrices,people:livePeople})
+    });
+  }catch(e){console.log('save error',e)}
 }
 async function clearVotes(){
   if(!confirm('Are you sure you want to reset all votes to zero?'))return;
