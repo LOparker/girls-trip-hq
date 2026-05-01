@@ -584,14 +584,13 @@ function closeEdit(){
   document.getElementById('edit-panel').classList.remove('open');
   editId=null;
 }
-function saveEdit(){
+async function saveEdit(){
   if(editId===null)return;
   const raw=document.getElementById('ep-input').value.trim();
   const n=parseFloat(raw.replace(/[$,]/g,''));
   if(isNaN(n)||n<=0){alert('Please enter a valid price.');return}
   const l=L.find(x=>x.id===editId);
   const old=S.prices[editId];
- const old=S.prices[editId];
 S.prices[editId]=n;
 livePrices[String(editId)]=n;
 await saveBin();
