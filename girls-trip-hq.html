@@ -633,7 +633,7 @@ async function vote(id){
   if(S.myVote===id)return;
   document.getElementById('vote-status').textContent='Saving your vote...';
   // undo previous vote
-  if(S.myVote)liveVotes[String(S.myVote]=Math.max(0,(liveVotes[String(S.myVote)]||1)-1);
+ if(S.myVote)liveVotes[String(S.myVote)]= Math.max(0,(liveVotes[String(S.myVote)]||1)-1);
   liveVotes[String(id)]=(liveVotes[String(id)]||0)+1;
   S.myVote=id;save();
   try{
