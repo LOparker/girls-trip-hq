@@ -1081,7 +1081,6 @@ document.querySelectorAll('#home-page .reveal').forEach(el=>ro.observe(el));
 
 /* INIT */
 load();loadH();
+fetchVotes();
 setTimeout(mini,700);
-</script>
-</body>
-</html>
+setInterval(fetchVotes,30000);
