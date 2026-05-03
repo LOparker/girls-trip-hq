@@ -839,7 +839,7 @@ function renderActs(){
 }
 async function addAct(){
   const inp=document.getElementById('act-input'),v=inp.value.trim();
-  if(!v)return;liveActs.push({text:v,cat:aTab});inp.value='';await saveBin();renderActs();
+  if(!v)return;liveActs.push({text:v,cat:aTab});inp.value='';renderActs();saveBin();
 }
 async function qAddCat(el,cat){
   const t=el.textContent.trim();if(liveActs.find(a=>a.text===t))return;
@@ -1040,7 +1040,8 @@ function renderHActs(){
 }
 async function addHAct(){
   const inp=document.getElementById('h-act-input'),v=inp.value.trim();
-  if(!v)return;hLiveActs.push({text:v,cat:hTab});inp.value='';await saveHBin();renderHActs();
+  if(!v)return;hLiveActs.push({text:v,cat:hTab});inp.value='';renderHActs();saveHBin();
+
 }
 async function qHAddCat(el,cat){
   const t=el.textContent.trim();if(hLiveActs.find(a=>a.text===t))return;
