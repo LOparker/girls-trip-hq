@@ -282,24 +282,25 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           </div>
         </div>
       </div>
-      <div class="trip-card card-dim reveal">
-        <div class="card-thumb" style="background:linear-gradient(135deg,#0A1828,#0D2D55,#1A4A80)">
-          <span class="card-status s-soon">Coming soon</span>
-          <span class="thumb-emoji">🌆</span>
-        </div>
-        <div class="card-body">
-          <div class="card-city">Houston</div>
-          <div class="card-region">Texas, USA</div>
-          <div class="card-pills">
-            <span class="pill">📅 Date TBD</span>
-            <span class="pill">🔜 Finding Airbnbs</span>
-          </div>
-          <div class="card-cta">
-            <span class="cta-label" style="color:var(--text3)">Coming soon...</span>
-            <div class="cta-arrow" style="background:var(--text3)">→</div>
-          </div>
-        </div>
-      </div>
+      <div class="trip-card reveal" onclick="goToHouston()">
+  <div class="card-thumb" style="background:linear-gradient(135deg,#1A0808,#5C1010,#8B1A1A)">
+    <span class="card-status s-active">✓ Planned</span>
+    <span class="thumb-emoji">🌆</span>
+  </div>
+  <div class="card-body">
+    <div class="card-city">Houston</div>
+    <div class="card-region">Texas, USA</div>
+    <div class="card-pills">
+      <span class="pill">📅 June 5–7, 2026</span>
+      <span class="pill">🌙 2 nights</span>
+      <span class="pill">2 Airbnbs to pick</span>
+    </div>
+    <div class="card-cta">
+      <span class="cta-label">Open trip planner</span>
+      <div class="cta-arrow">→</div>
+    </div>
+  </div>
+</div>
       <div class="trip-card card-add reveal">
         <div class="add-icon">＋</div>
         <div class="add-label">New destination</div>
@@ -446,7 +447,136 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   </div>
 </div>
 
+<!-- ══ HOUSTON ══ -->
+<div id="houston-page" class="page">
+  <div class="back-bar">
+    <button class="back-btn" onclick="goHome()">← Girls Trip HQ</button>
+    <span class="back-title">Houston, TX · June 5–7</span>
+  </div>
+
+  <section class="a-hero">
+    <div class="blob" style="width:500px;height:500px;background:radial-gradient(circle,#C0272750,transparent 70%);top:-80px;left:-80px;animation:bm1 9s ease-in-out infinite"></div>
+    <div class="blob" style="width:600px;height:600px;background:radial-gradient(circle,#8B000045,transparent 70%);bottom:-120px;right:-80px;animation:bm2 11s ease-in-out infinite"></div>
+    <div class="blob" style="width:350px;height:350px;background:radial-gradient(circle,#FF6B6B30,transparent 70%);top:45%;left:45%;animation:bm3 7s ease-in-out infinite"></div>
+    <div class="a-inner">
+      <div class="a-badge" style="background:rgba(192,39,39,.14);border-color:rgba(192,39,39,.3);color:#FF6B6B">🌆 girls trip confirmed</div>
+      <h1 class="a-title" style="-webkit-text-stroke:0">We're going<br/><em style="-webkit-text-stroke:2px #C02727;color:transparent">to Houston</em></h1>
+      <p class="a-sub">Two cities. One crew. Let's go.</p>
+      <div class="a-chips">
+        <div class="achip">📅 <b>June 5–7, 2026</b></div>
+        <div class="achip">🌙 <b>2 Nights</b></div>
+        <div class="achip">📍 <b>Houston, TX</b></div>
+      </div>
+    </div>
+    <div class="scroll-hint"><span>scroll</span><div class="arr"></div></div>
+  </section>
+
+  <div class="a-div"></div>
+
+  <section class="a-sec">
+    <div class="a-wrap">
+      <div class="reveal">
+        <p class="a-eye" style="color:#FF6B6B">Where we're staying</p>
+        <h2 class="a-stitle">Pick our spot 🏠</h2>
+        <p class="a-ssub">Tap <strong style="color:#FF6B6B">Set price</strong> on any card to enter the Airbnb total. Adjust the headcount and everything recalculates instantly.</p>
+      </div>
+      <div class="ctrl-bar reveal" style="background:#2A1212">
+        <div class="ctrl-left">
+          <span class="ctrl-label">👥 People going:</span>
+          <button class="pp-btn" onclick="changeHPeople(-1)">−</button>
+          <span class="pp-count" id="hpp-display">6</span>
+          <button class="pp-btn" onclick="changeHPeople(1)">+</button>
+        </div>
+        <div class="ctrl-right" id="h-last-updated"></div>
+      </div>
+      <div class="bnb-grid reveal" id="h-bnb-grid"></div>
+      <div id="h-sum-wrap"></div>
+    </div>
+  </section>
+
+  <div class="edit-overlay" id="h-edit-overlay" onclick="closeHEdit()"></div>
+  <div class="edit-panel" id="h-edit-panel">
+    <div class="ep-head">
+      <div>
+        <div class="ep-emoji" id="h-ep-emoji"></div>
+        <div class="ep-name" id="h-ep-name"></div>
+      </div>
+      <button class="ep-close" onclick="closeHEdit()">×</button>
+    </div>
+    <div class="ep-field">
+      <label class="ep-label">Total price for both nights</label>
+      <div class="ep-input-row" style="border-color:rgba(192,39,39,.2)">
+        <span class="ep-dollar">$</span>
+        <input type="number" id="h-ep-input" class="ep-input" placeholder="e.g. 450" min="0"/>
+      </div>
+      <p class="ep-hint">Open the Airbnb link → find the total for June 5–7 → enter it here.</p>
+    </div>
+    <div class="ep-actions">
+      <button class="ep-save" style="background:#C02727;color:#fff" onclick="saveHEdit()">Save price ✓</button>
+      <button class="ep-clear" onclick="clearHEdit()">Clear</button>
+    </div>
+    <a class="ep-airbnb-link" id="h-ep-airbnb-link" style="color:#FF6B6B" target="_blank" rel="noopener">View this listing on Airbnb ↗</a>
+  </div>
+
+  <div class="a-div"></div>
+
+  <section class="a-sec">
+    <div class="a-wrap">
+      <div class="reveal">
+        <p class="a-eye" style="color:#FF6B6B">Cast your vote</p>
+        <h2 class="a-stitle">Which one are you feeling? 👇</h2>
+        <p class="a-ssub">Tap your fave — votes save automatically.</p>
+      </div>
+      <div class="vote-grid reveal" id="h-vote-grid"></div>
+      <div id="h-vote-status" style="text-align:center;margin-top:1rem;font-size:13px;color:#6B5E85;font-style:italic"></div>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="clearHVotes()" style="background:none;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:6px 18px;font-size:12px;color:#4A4268;cursor:pointer;font-family:'DM Sans',sans-serif">Reset all votes</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="a-div"></div>
+
+  <section class="a-sec">
+    <div class="a-wrap">
+      <div class="reveal">
+        <p class="a-eye" style="color:#FF6B6B">The itinerary</p>
+        <h2 class="a-stitle">What we're doing 🎉</h2>
+        <p class="a-ssub">Add activities as we plan — tap suggestions or type your own.</p>
+      </div>
+      <div class="act-box reveal" style="background:#1A0E0E">
+        <div class="add-row">
+          <input type="text" id="h-act-input" placeholder="Add an activity… e.g. Houston Space Center 🚀"/>
+          <button class="addbtn" style="background:#C02727" onclick="addHAct()">+ Add</button>
+        </div>
+        <div class="act-list" id="h-act-list">
+          <div class="a-empty" id="h-act-empty"><div style="font-size:28px;margin-bottom:8px">🗺️</div><p>Nothing yet — tap suggestions below!</p></div>
+        </div>
+        <p class="sug-lbl">Quick add</p>
+        <div class="sugs" id="h-sugs">
+          <span class="sc" onclick="qHAdd(this)">🚀 Space Center Houston</span>
+          <span class="sc" onclick="qHAdd(this)">🎨 Museum District</span>
+          <span class="sc" onclick="qHAdd(this)">🍹 Midtown Bars</span>
+          <span class="sc" onclick="qHAdd(this)">🛍️ The Galleria</span>
+          <span class="sc" onclick="qHAdd(this)">🌿 Buffalo Bayou Park</span>
+          <span class="sc" onclick="qHAdd(this)">🎵 Live Music on Washington Ave</span>
+          <span class="sc" onclick="qHAdd(this)">🍜 Chinatown Food Tour</span>
+          <span class="sc" onclick="qHAdd(this)">🎤 Karaoke Night</span>
+          <span class="sc" onclick="qHAdd(this)">🏀 Catch a Rockets Game</span>
+          <span class="sc" onclick="qHAdd(this)">🌮 Ninfa's on Navigation</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="a-footer">
+    <p style="color:#A89DC0">Girls Trip HQ &nbsp;·&nbsp; <strong style="color:#C02727">Houston, TX — June 5–7, 2026</strong></p>
+    <button class="hype-btn" style="background:linear-gradient(135deg,#C02727,#8B0000)" onclick="launchConfetti()">🎉 I'm SO in!!</button>
+  </div>
+</div>
+
 <script>
+
 /* STARS */
 (function(){
   const c=document.getElementById('stars');
@@ -768,6 +898,232 @@ const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.targe
 document.querySelectorAll('#home-page .reveal').forEach(el=>ro.observe(el));
 
 /* INIT */
+/* ══ HOUSTON DATA ══ */
+const HL=[
+  {id:1,name:"Fire Pit + Outdoor Movie | Cozy Modern Retreat",emoji:"🔥",glow:"#C0272740",bg:"linear-gradient(135deg,#C0272733,#C0272708)",tag:"Houston, TX · Fire Pit · Outdoor Movie",url:"https://www.airbnb.com/rooms/1478667071274131097?adults=6&check_in=2026-06-05&check_out=2026-06-07"},
+  {id:2,name:"Modern Home, Game Room, Pool Table",emoji:"🎱",glow:"#8B000040",bg:"linear-gradient(135deg,#8B000033,#8B000008)",tag:"Houston, TX · Game Room · Pool Table",url:"https://www.airbnb.com/rooms/1605485513280882022?adults=6&check_in=2026-06-05&check_out=2026-06-07"}
+];
+
+const H_BIN_ID='69f4efee36566621a814470b';
+const H_BIN_KEY='$2a$10$IZxrL2OiEANU06ryrmOwRucT6lVHGGQNe4d98lWxrFnQrY1Yr858G';
+const H_BIN_URL=`https://api.jsonbin.io/v3/b/${H_BIN_ID}`;
+let hLiveVotes={'1':0,'2':0};
+let hLivePrices={};
+let hLivePeople=6;
+let hEditId=null;
+let HS={people:6,myVote:null,acts:[],changelog:[]};
+const HSK='gthq_houston_v1';
+
+function loadH(){try{const d=localStorage.getItem(HSK);if(d)HS={...HS,...JSON.parse(d)}}catch(e){}}
+function saveH(){try{localStorage.setItem(HSK,JSON.stringify(HS))}catch(e){}}
+
+function goToHouston(){
+  document.getElementById('home-page').classList.remove('active');
+  document.getElementById('houston-page').classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+  setTimeout(()=>document.querySelectorAll('#houston-page .reveal').forEach(el=>ro.observe(el)),100);
+  fetchHVotes();
+  mini();
+}
+
+async function fetchHVotes(){
+  try{
+    const r=await fetch(H_BIN_URL+'/latest',{headers:{'X-Master-Key':H_BIN_KEY}});
+    const d=await r.json();
+    hLiveVotes=d.record.hVotes||{'1':0,'2':0};
+    hLivePrices=d.record.hPrices||{};
+    hLivePeople=d.record.hPeople||6;
+    HS.people=hLivePeople;
+    document.getElementById('hpp-display').textContent=HS.people;
+    renderHCards();
+    renderHVotes();
+    renderHLastUpdated();
+  }catch(e){console.log('houston fetch error',e)}
+}
+
+async function saveHBin(){
+  try{
+    const r=await fetch(H_BIN_URL+'/latest',{headers:{'X-Master-Key':H_BIN_KEY}});
+    const d=await r.json();
+    const current=d.record;
+    await fetch(H_BIN_URL,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':H_BIN_KEY},
+      body:JSON.stringify({...current,hVotes:hLiveVotes,hPrices:hLivePrices,hPeople:hLivePeople})
+    });
+  }catch(e){console.log('houston save error',e)}
+}
+
+function renderHCards(){
+  const g=document.getElementById('h-bnb-grid');g.innerHTML='';
+  HL.forEach(l=>{
+    const t=hLivePrices[String(l.id)]||null,pp=t?t/hLivePeople:null,pn=t?t/2:null;
+    const c=document.createElement('div');c.className='bnb-card';
+    c.innerHTML=`<div class="bnb-thumb" style="background:${l.bg}"><span style="filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))">${l.emoji}</span></div>
+    <div class="bnb-body">
+      <div class="bnb-name">${l.name}</div><span class="bnb-tag">${l.tag}</span>
+      <div class="bnb-prices">
+        <div class="pb"><span class="plabel">Total · 2 nights</span><span class="pval">${t?'$'+Math.round(t).toLocaleString():'—'}</span><span class="psub">${pn?'$'+Math.round(pn).toLocaleString()+'/night':'tap Set price'}</span></div>
+        <div class="pb"><span class="plabel">Per person</span><span class="pper" style="color:#FF6B6B">${pp?'$'+Math.round(pp).toLocaleString():'—'}</span><span class="psub">÷ ${hLivePeople} people</span></div>
+      </div>
+      <div class="bnb-foot">
+        <a class="bnb-link" style="color:#FF6B6B" href="${l.url}" target="_blank" rel="noopener">View on Airbnb ↗</a>
+        <button class="spbtn" style="background:rgba(192,39,39,.1);border-color:rgba(192,39,39,.25);color:#FF6B6B" onclick="openHEdit(${l.id})">Set price</button>
+      </div>
+    </div>`;
+    g.appendChild(c);
+  });
+  renderHSum();
+}
+
+function renderHSum(){
+  const w=document.getElementById('h-sum-wrap');
+  const set=HL.filter(l=>hLivePrices[String(l.id)]);
+  if(!set.length){w.innerHTML='';return}
+  const ch=set.reduce((a,b)=>hLivePrices[String(a.id)]<hLivePrices[String(b.id)]?a:b);
+  const minPP=Math.round(hLivePrices[String(ch.id)]/hLivePeople);
+  const maxPP=Math.round(Math.max(...set.map(l=>hLivePrices[String(l.id)]))/hLivePeople);
+  w.innerHTML=`<div class="sum-bar" style="background:linear-gradient(135deg,rgba(192,39,39,.15),rgba(139,0,0,.15));border-color:rgba(192,39,39,.3)"><div class="sum-grid">
+    <div class="si"><span class="slabel">Priced</span><span class="sval">${set.length}/2</span><span class="ssub">options</span></div>
+    <div class="si"><span class="slabel">Best / person</span><span class="sval" style="color:#FF6B6B">$${minPP.toLocaleString()}</span><span class="ssub">${ch.name.split(/[|,]/)[0].trim()}</span></div>
+    <div class="si"><span class="slabel">Range / person</span><span class="sval">$${minPP.toLocaleString()}–$${maxPP.toLocaleString()}</span><span class="ssub">${set.length} options</span></div>
+    <div class="si"><span class="slabel">Splitting</span><span class="sval">${hLivePeople} ways</span><span class="ssub">2 nights</span></div>
+  </div></div>`;
+}
+
+function renderHLastUpdated(){
+  const el=document.getElementById('h-last-updated');
+  if(!HS.changelog||!HS.changelog.length){el.innerHTML='';return}
+  const last=HS.changelog[0];
+  el.innerHTML=`Last update: <strong>${last.msg}</strong> — ${last.time}`;
+}
+
+function openHEdit(id){
+  hEditId=id;
+  const l=HL.find(x=>x.id===id);
+  document.getElementById('h-ep-emoji').textContent=l.emoji;
+  document.getElementById('h-ep-name').textContent=l.name;
+  document.getElementById('h-ep-input').value=hLivePrices[String(id)]||'';
+  document.getElementById('h-ep-airbnb-link').href=l.url;
+  document.getElementById('h-edit-overlay').classList.add('open');
+  document.getElementById('h-edit-panel').classList.add('open');
+  setTimeout(()=>document.getElementById('h-ep-input').focus(),350);
+}
+function closeHEdit(){
+  document.getElementById('h-edit-overlay').classList.remove('open');
+  document.getElementById('h-edit-panel').classList.remove('open');
+  hEditId=null;
+}
+async function saveHEdit(){
+  if(hEditId===null)return;
+  const raw=document.getElementById('h-ep-input').value.trim();
+  const n=parseFloat(raw.replace(/[$,]/g,''));
+  if(isNaN(n)||n<=0){alert('Please enter a valid price.');return}
+  const l=HL.find(x=>x.id===hEditId);
+  const old=hLivePrices[String(hEditId)];
+  hLivePrices[String(hEditId)]=n;
+  const msg=old?`${l.name.split(/[|,]/)[0].trim()} updated from $${Math.round(old).toLocaleString()} to $${Math.round(n).toLocaleString()}`:`${l.name.split(/[|,]/)[0].trim()} price set to $${Math.round(n).toLocaleString()}`;
+  if(!HS.changelog)HS.changelog=[];
+  HS.changelog.unshift({type:'price',msg,time:ts()});
+  if(HS.changelog.length>20)HS.changelog.pop();
+  saveH();
+  await saveHBin();
+  renderHCards();
+  renderHLastUpdated();
+  closeHEdit();
+  mini();
+}
+async function clearHEdit(){
+  if(hEditId===null)return;
+  if(hLivePrices[String(hEditId)]){
+    delete hLivePrices[String(hEditId)];
+    await saveHBin();
+    renderHCards();
+  }
+  closeHEdit();
+}
+document.getElementById('h-ep-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveHEdit()});
+
+async function changeHPeople(delta){
+  const next=Math.max(1,HS.people+delta);
+  if(next===HS.people)return;
+  const old=HS.people;
+  HS.people=next;hLivePeople=next;
+  if(!HS.changelog)HS.changelog=[];
+  HS.changelog.unshift({type:'people',msg:`Headcount changed from ${old} to ${next} people`,time:ts()});
+  if(HS.changelog.length>20)HS.changelog.pop();
+  saveH();
+  await saveHBin();
+  document.getElementById('hpp-display').textContent=next;
+  renderHCards();
+  renderHLastUpdated();
+  mini();
+}
+
+async function fetchHVotesAndRender(){await fetchHVotes()}
+
+async function hVote(id){
+  if(HS.myVote===id)return;
+  document.getElementById('h-vote-status').textContent='Saving your vote...';
+  if(HS.myVote)hLiveVotes[String(HS.myVote)]=Math.max(0,(hLiveVotes[String(HS.myVote)]||1)-1);
+  hLiveVotes[String(id)]=(hLiveVotes[String(id)]||0)+1;
+  HS.myVote=id;saveH();
+  await saveHBin();
+  document.getElementById('h-vote-status').textContent='Vote saved! ✓';
+  setTimeout(()=>document.getElementById('h-vote-status').textContent='',2000);
+  renderHVotes();mini();
+}
+
+async function clearHVotes(){
+  if(!confirm('Reset all Houston votes to zero?'))return;
+  hLiveVotes={'1':0,'2':0};
+  HS.myVote=null;saveH();
+  await saveHBin();
+  renderHVotes();
+  document.getElementById('h-vote-status').textContent='Votes cleared! ✓';
+  setTimeout(()=>document.getElementById('h-vote-status').textContent='',2000);
+}
+
+function renderHVotes(){
+  const g=document.getElementById('h-vote-grid');g.innerHTML='';
+  const total=Object.values(hLiveVotes).reduce((a,b)=>a+b,0);
+  HL.forEach(l=>{
+    const cnt=hLiveVotes[String(l.id)]||0,pct=total>0?Math.round((cnt/total)*100):0,v=HS.myVote===l.id;
+    const c=document.createElement('div');c.className='vcard'+(v?' voted':'');
+    c.style.setProperty('--glow',l.glow);c.onclick=()=>hVote(l.id);
+    c.innerHTML=`<div class="vbadge" style="background:#C02727;color:#fff">${cnt} vote${cnt!==1?'s':''}</div>
+      <span class="vemoji">${l.emoji}</span>
+      <div class="vname">${l.name.split(/[|,]/)[0].trim()}</div>
+      <div class="vtag">${v?'✓ Your pick':'Tap to vote'}</div>
+      <div style="margin-top:10px;background:rgba(255,255,255,.07);border-radius:20px;height:6px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:#C02727;border-radius:20px;transition:width .5s ease"></div>
+      </div>
+      <div style="font-size:11px;color:#6B5E85;margin-top:4px">${pct}%</div>`;
+    g.appendChild(c);
+  });
+}
+
+function renderHActs(){
+  const list=document.getElementById('h-act-list'),emp=document.getElementById('h-act-empty');
+  list.querySelectorAll('.aitem').forEach(e=>e.remove());
+  emp.style.display=HS.acts.length?'none':'block';
+  HS.acts.forEach((a,i)=>{
+    const d=document.createElement('div');d.className='aitem';
+    d.innerHTML=`<div class="adot" style="background:#C02727"></div><span class="atext">${a}</span><button class="arm" onclick="remHAct(${i})">×</button>`;
+    list.appendChild(d);
+  });
+  document.querySelectorAll('#h-sugs .sc').forEach(c=>c.classList.toggle('done',HS.acts.includes(c.textContent.trim())));
+}
+function addHAct(){
+  const inp=document.getElementById('h-act-input'),v=inp.value.trim();
+  if(!v)return;HS.acts.push(v);inp.value='';saveH();renderHActs();
+}
+function qHAdd(el){const t=el.textContent.trim();if(HS.acts.includes(t))return;HS.acts.push(t);saveH();renderHActs()}
+function remHAct(i){HS.acts.splice(i,1);saveH();renderHActs()}
+document.getElementById('h-act-input').addEventListener('keydown',e=>{if(e.key==='Enter')addHAct()});
+
+loadH();
+renderHActs();
 load();
 document.getElementById('pp-display').textContent=S.people;
 renderCards();
