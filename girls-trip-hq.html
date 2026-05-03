@@ -1082,7 +1082,18 @@ document.querySelectorAll('#home-page .reveal').forEach(el=>ro.observe(el));
 
 /* INIT */
 load();loadH();
+renderCards();
+renderVotes();
+renderActs();
+renderLastUpdated();
+renderHCards();
+renderHVotes();
+renderHActs();
+renderHLastUpdated();
+fetchVotes();
+fetchHVotes();
 setTimeout(mini,700);
+setInterval(fetchVotes,30000);
 </script>
 </body>
 </html>
