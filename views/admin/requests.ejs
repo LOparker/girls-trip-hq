@@ -1,0 +1,16 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>Trip requests</h1><div class="sub">Every inquiry submitted on the website.</div></div>
+  <form method="get" class="btn-row"><input type="text" name="q" value="<%= q || '' %>" placeholder="Search name, email, destination, ref" style="width:280px"><% if (status) { %><input type="hidden" name="status" value="<%= status %>"><% } %><button class="btn">Search</button></form></div>
+<div class="tabs"><a href="/admin/requests" class="<%= !status ? 'on' : '' %>">All</a><% C.REQUEST_STATUSES.forEach(function (s) { %><a href="/admin/requests?status=<%= encodeURIComponent(s) %>" class="<%= status === s ? 'on' : '' %>"><%= s %></a><% }) %></div>
+<div class="card table-wrap"><table>
+  <tr><th>Ref</th><th>Received</th><th>Customer</th><th>Destination</th><th>Dates</th><th>Travelers</th><th>Budget</th><th>Status</th></tr>
+  <% list.forEach(function (r) { %><tr>
+    <td><a href="/admin/requests/<%= r.id %>"><%= r.ref_code %></a></td><td class="nowrap"><%= fmtDate(r.created_at) %></td>
+    <td><%= r.customer_name %><div class="muted small"><%= r.email %></div></td><td><%= r.destination || 'Open' %></td>
+    <td class="nowrap"><%= r.depart_date ? fmtDate(r.depart_date) + ' to ' + fmtDate(r.return_date) : 'Flexible' %></td>
+    <td><%= travelersText(r.adults, r.children) %></td>
+    <td class="nowrap"><%= r.budget_total ? money(r.budget_total) + ' total' : r.budget_per_person ? money(r.budget_per_person) + ' pp' : '' %></td>
+    <td><span class="pill <%= statusClass(r.status) %>"><%= r.status %></span></td></tr><% }) %>
+  <% if (!list.length) { %><tr><td colspan="8" class="muted">No requests found.</td></tr><% } %>
+</table></div>
+<%- include('_foot') %>

@@ -1,0 +1,9 @@
+node_modules/
+# Customer data, logins and booking documents. Never commit these.
+data/
+uploads/*
+!uploads/.gitkeep
+.env
+*.log
+.DS_Store
+.claude/

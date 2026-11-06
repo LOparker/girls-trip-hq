@@ -1,0 +1,7 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>Proposals</h1><div class="sub">Create a proposal from a trip request: tick the packages to present, then build.</div></div></div>
+<div class="card table-wrap"><table><tr><th>Proposal</th><th>Customer</th><th>Options</th><th>Status</th><th>Sent</th><th></th></tr>
+  <% list.forEach(function (p) { %><tr><td><a href="/admin/proposals/<%= p.id %>"><%= p.title %></a><div class="muted small"><%= p.ref_code %></div></td><td><%= p.customer_name %></td><td><%= p.items %></td>
+    <td><span class="pill <%= statusClass(p.status) %>"><%= p.status %></span></td><td><%= fmtDate(p.sent_at) %></td><td class="right"><% if (p.status !== 'Draft') { %><a href="/proposal/<%= p.token %>" target="_blank" class="small">Customer view</a><% } %></td></tr><% }) %>
+  <% if (!list.length) { %><tr><td colspan="6" class="muted">No proposals yet.</td></tr><% } %></table></div>
+<%- include('_foot') %>

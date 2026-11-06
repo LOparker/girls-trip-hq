@@ -1,0 +1,37 @@
+<%- include('../partials/header') %>
+<section class="page-hero">
+  <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=2000&q=80')"></div>
+  <div class="wrap">
+    <span class="eyebrow" style="color:#f1d7b3">Explore</span>
+    <h1>Explore Destinations</h1>
+    <p>Beaches, cities and journeys around the world. Choose a destination to see things to do, where to stay and travel tips.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="wrap">
+    <div class="tabs-inline">
+      <a href="/destinations" class="<%= !region ? 'active' : '' %>">All</a>
+      <% regions.forEach(function (r) { %><a href="/destinations?region=<%= encodeURIComponent(r) %>" class="<%= region === r ? 'active' : '' %>"><%= r %></a><% }) %>
+    </div>
+    <div class="grid g3">
+      <% list.forEach(function (d) { %>
+      <article class="card reveal">
+        <a href="/destinations/<%= d.slug %>" class="card-img" style="background-image:url('<%= d.image.replace('w=1600', 'w=900') %>')" aria-label="<%= d.name %>"><span class="tag"><%= d.region %></span></a>
+        <div class="card-body">
+          <h3><a href="/destinations/<%= d.slug %>"><%= d.name %></a></h3>
+          <p class="muted small"><%= d.summary %></p>
+          <p class="small" style="margin-bottom:6px"><strong>Best time to go:</strong> <%= d.season %></p>
+          <ul class="pill-list"><% d.attractions.slice(0, 3).forEach(function (a) { %><li><%= a %></li><% }) %></ul>
+          <div class="card-foot">
+            <div class="price" style="font-size:1.15rem">
+              <% if (d.verifiedFrom) { %>From <%= money(d.verifiedFrom.amount) %><small><%= d.verifiedFrom.note %></small><% } else { %>Pricing on request<small>Quoted for your dates</small><% } %>
+            </div>
+            <a href="/destinations/<%= d.slug %>#packages" class="btn btn-primary btn-sm">Explore Packages</a>
+          </div>
+        </div>
+      </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

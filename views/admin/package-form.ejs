@@ -1,0 +1,57 @@
+<%- include('_head') %>
+<% var v = function (k) { return p[k] == null ? '' : p[k]; }; %>
+<div class="topline"><div><h1><%= p.id ? 'Edit package' : 'New package' %></h1>
+  <div class="sub"><% if (p.request_id) { %>Custom package for <a href="/admin/requests/<%= p.request_id %>">request #<%= p.request_id %></a><% } else { %>Website package<% } %><% if (p.id && p.is_public && p.status === 'Active') { %> · <a href="/packages/<%= p.id %>" target="_blank">View on website</a><% } %></div></div></div>
+<% if (p.is_sample) { %><div class="warn-box">This package uses SAMPLE pricing. It cannot be sent to a customer until you check the real price with the supplier, update the numbers below and tick "I verified this pricing".</div><% } %>
+<form class="card" method="post" action="/admin/packages<%= p.id ? '/' + p.id : '' %>" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="request_id" value="<%= v('request_id') %>"><input type="hidden" name="customer_id" value="<%= v('customer_id') %>">
+  <h2>Overview</h2>
+  <div class="fr">
+    <div><label>Package name</label><input type="text" name="name" value="<%= v('name') %>" required></div>
+    <div><label>Category</label><select name="category"><% Object.keys(PACKAGE_CATEGORIES).forEach(function (k) { %><option value="<%= k %>" <%= p.category === k ? 'selected' : '' %>><%= PACKAGE_CATEGORIES[k] %></option><% }) %></select></div>
+    <div><label>Provider</label><input type="text" name="provider" value="<%= v('provider') %>" placeholder="e.g. Delta Vacations"></div>
+  </div>
+  <div class="fr">
+    <div><label>Destination guide</label><select name="destination_slug"><option value="">None</option><% destinations.forEach(function (d) { %><option value="<%= d.slug %>" <%= p.destination_slug === d.slug ? 'selected' : '' %>><%= d.name %></option><% }) %></select></div>
+    <div><label>Destination name shown</label><input type="text" name="destination_name" value="<%= v('destination_name') %>"></div>
+    <div><label>Status</label><select name="status"><% ['Draft', 'Active', 'Inactive'].forEach(function (s) { %><option <%= p.status === s ? 'selected' : '' %>><%= s %></option><% }) %></select></div>
+  </div>
+  <div class="fr two"><div><label>Short summary</label><textarea name="summary" style="min-height:60px"><%= v('summary') %></textarea></div><div><label>Description</label><textarea name="description" style="min-height:60px"><%= v('description') %></textarea></div></div>
+  <label class="check"><input type="checkbox" name="is_public" value="1" <%= p.is_public ? 'checked' : '' %>> Show on the public website (Packages page and destination page)</label>
+
+  <h2 style="margin-top:18px">Trip details</h2>
+  <div class="fr four">
+    <div><label>Start date</label><input type="date" name="start_date" value="<%= v('start_date') %>"></div><div><label>End date</label><input type="date" name="end_date" value="<%= v('end_date') %>"></div>
+    <div><label>Nights</label><input type="number" name="nights" value="<%= v('nights') %>"></div><div><label>Travelers</label><input type="number" name="travelers" value="<%= v('travelers') %>"></div>
+  </div>
+  <div class="fr two">
+    <div><label>Hotel</label><input type="text" name="hotel_name" value="<%= v('hotel_name') %>"></div><div><label>Room type / upgrades</label><input type="text" name="room_type" value="<%= v('room_type') %>"></div>
+    <div><label>Hotel details and amenities</label><textarea name="hotel_details"><%= v('hotel_details') %></textarea></div><div><label>Flight details</label><textarea name="flight_details"><%= v('flight_details') %></textarea></div>
+    <div><label>Activities and excursions (one per line)</label><textarea name="activities"><%= v('activities') %></textarea></div><div><label>Transportation</label><textarea name="transportation"><%= v('transportation') %></textarea></div>
+    <div><label>What's included (one per line)</label><textarea name="inclusions"><%= v('inclusions') %></textarea></div><div><label>What's excluded (one per line)</label><textarea name="exclusions"><%= v('exclusions') %></textarea></div>
+    <div><label>Dining recommendations</label><textarea name="dining"><%= v('dining') %></textarea></div>
+    <div><label>Private supplier notes (never shown to customers)</label><textarea name="supplier_notes"><%= v('supplier_notes') %></textarea></div>
+  </div>
+
+  <h2 style="margin-top:18px">Pricing</h2>
+  <div class="fr four">
+    <div><label>Price per person (USD)</label><input type="number" step="0.01" name="estimated_price_pp" value="<%= v('estimated_price_pp') %>"></div>
+    <div><label>Total for group (USD)</label><input type="number" step="0.01" name="estimated_total" value="<%= v('estimated_total') %>"></div>
+    <div><label>Price type</label><select name="price_type"><% ['Estimated', 'Quoted', 'Sample'].forEach(function (s) { %><option <%= p.price_type === s ? 'selected' : '' %>><%= s %></option><% }) %></select></div>
+    <div><label>Pricing last checked</label><input type="text" value="<%= p.pricing_checked_at ? fmtDateTime(p.pricing_checked_at) : 'Not yet' %>" disabled></div>
+  </div>
+  <div class="fr">
+    <div><label>Pricing source</label><input type="text" name="pricing_source" value="<%= v('pricing_source') %>" placeholder="Where the price came from"></div>
+    <div><label>Booking source</label><input type="text" name="booking_source" value="<%= v('booking_source') %>" placeholder="e.g. Bundled package"></div>
+    <div><label>Booking URL</label><input type="url" name="booking_url" value="<%= v('booking_url') %>"></div>
+  </div>
+  <label class="check"><input type="checkbox" name="verified_now" value="1"> I verified this pricing with the supplier just now (records the check time<%= p.is_sample ? ' and removes the SAMPLE flag' : '' %>)</label>
+
+  <h2 style="margin-top:18px">Photos</h2>
+  <% if (p.images && p.images.length) { %><div class="thumbs" style="margin-bottom:12px"><% p.images.forEach(function (img) { %><label><img src="<%= img %>" alt=""><input type="checkbox" name="remove_image" value="<%= img %>"> Remove</label><% }) %></div><% } %>
+  <div class="fr two"><div><label>Upload photos (JPG, PNG, WebP up to 8 MB each)</label><input type="file" name="images" accept="image/jpeg,image/png,image/webp" multiple></div>
+    <div><label>Or add a photo by https URL</label><input type="url" name="image_url" placeholder="https://images.unsplash.com/..."></div></div>
+  <p class="muted small">Use photos you own or have permission to use (for example your own photos, supplier media kits or free license libraries).</p>
+  <button class="btn primary" style="margin-top:8px">Save package</button>
+</form>
+<%- include('_foot') %>

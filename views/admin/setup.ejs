@@ -1,0 +1,14 @@
+<%- include('_head') %>
+<div class="auth">
+  <h1>Welcome</h1>
+  <p class="muted">Create the owner account for your dashboard. This page only works once, while no accounts exist.</p>
+  <% if (error) { %><div class="flash error"><%= error %></div><% } %>
+  <form method="post" action="/admin/setup">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="fr one"><div><label for="n">Your name</label><input type="text" id="n" name="name" required></div></div>
+    <div class="fr one"><div><label for="e">Email</label><input type="email" id="e" name="email" autocomplete="username" required></div></div>
+    <div class="fr one"><div><label for="p">Password (10+ characters)</label><input type="password" id="p" name="password" minlength="10" autocomplete="new-password" required></div></div>
+    <button class="btn primary" type="submit" style="width:100%; justify-content:center">Create owner account</button>
+  </form>
+</div>
+<%- include('_foot') %>

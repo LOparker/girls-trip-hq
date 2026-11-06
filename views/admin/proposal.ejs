@@ -1,0 +1,50 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>Proposal builder</h1><div class="sub"><a href="/admin/requests/<%= p.request_id %>"><%= p.request.ref_code %> · <%= p.customer.name %></a> · <span class="pill <%= statusClass(p.status) %>"><%= p.status %></span><% if (p.sent_at) { %> · sent <%= fmtDateTime(p.sent_at) %><% } %></div></div>
+  <div class="btn-row"><a class="btn" href="/admin/proposals/<%= p.id %>/preview" target="_blank">Preview as customer</a>
+    <% if (p.status !== 'Draft') { %><a class="btn" href="/proposal/<%= p.token %>" target="_blank">Live customer link</a><% } %></div></div>
+<% if (p.items.some(function (i) { return i.is_sample; })) { %><div class="warn-box">One or more packages use SAMPLE pricing. Open each one, check real pricing with the supplier and tick "I verified this pricing" before sending.</div><% } %>
+<% if (p.status === 'Selected') { %><div class="warn-box">The customer already selected an option. Changes here no longer affect what they saw; their quoted price is preserved.</div><% } %>
+<form method="post" action="/admin/proposals/<%= p.id %>">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <div class="card">
+    <h2>Presentation</h2>
+    <div class="fr two"><div><label>Title</label><input type="text" name="title" value="<%= p.title || '' %>"></div><div><label>Quote valid until</label><input type="date" name="valid_until" value="<%= p.valid_until || '' %>"></div></div>
+    <div class="fr two"><div><label>Introduction</label><textarea name="intro"><%= p.intro || '' %></textarea></div><div><label>Closing note</label><textarea name="closing_note"><%= p.closing_note || '' %></textarea></div></div>
+    <div class="fr one"><div><label>Payment and deposit information (only state confirmed terms)</label><textarea name="deposit_info" style="min-height:60px"><%= p.deposit_info || '' %></textarea></div></div>
+  </div>
+  <% p.items.forEach(function (it) { var k = 'item_' + it.id + '_'; %>
+  <div class="card">
+    <div class="btn-row" style="justify-content:space-between"><h2 style="margin:0"><%= it.pkg_name %> <% if (it.is_sample) { %><span class="pill sample">SAMPLE</span><% } %></h2>
+      <div class="btn-row"><a class="btn small" href="/admin/packages/<%= it.package_id %>/edit">Edit package</a>
+        <label class="check"><input type="radio" name="recommended" value="<%= it.id %>" <%= it.recommended ? 'checked' : '' %>> Agent's pick</label>
+        <label class="check"><input type="checkbox" name="<%= k %>remove" value="1"> Remove</label></div></div>
+    <div class="fr" style="margin-top:12px">
+      <div><label>Headline shown to customer (optional)</label><input type="text" name="<%= k %>headline" value="<%= it.headline || '' %>" placeholder="<%= it.pkg_name %>"></div>
+      <div><label>Order</label><input type="number" name="<%= k %>sort" value="<%= it.sort %>"></div>
+      <div><label class="check" style="margin-top:22px"><input type="checkbox" name="<%= k %>include_link" value="1" <%= it.include_link ? 'checked' : '' %>> Show supplier link to customer</label></div>
+    </div>
+    <div class="fr one"><div><label>Your recommendation note to the customer</label><textarea name="<%= k %>agent_note" style="min-height:60px"><%= it.agent_note || '' %></textarea></div></div>
+    <div class="fr four">
+      <div><label>Supplier cost (base total)</label><input type="number" step="0.01" name="<%= k %>base_total" value="<%= it.base_total != null ? it.base_total : (it.estimated_total || '') %>"></div>
+      <div><label>Markup %</label><input type="number" step="0.1" name="<%= k %>markup_pct" value="<%= it.markup_pct || 0 %>"></div>
+      <div><label>Service fee (USD)</label><input type="number" step="0.01" name="<%= k %>service_fee" value="<%= it.service_fee || 0 %>"></div>
+      <div><label>Customer price override</label><input type="number" step="0.01" name="<%= k %>customer_total" value="<%= it.customer_total || '' %>"><label class="check"><input type="checkbox" name="<%= k %>use_override" value="1"> Use override</label></div>
+    </div>
+    <p class="small" style="margin:0">Customer sees: <strong><%= money(it.customer_total) %></strong> total, <%= money(it.customer_pp) %> per person · pricing checked <%= it.pkg_checked ? fmtDateTime(it.pkg_checked) : 'never' %>
+      <span class="muted"> · Internal: margin <%= money((it.customer_total || 0) - (it.base_total || 0)) %>. Only charge fees and markups your host agency and supplier agreements allow, and disclose them.</span></p>
+  </div>
+  <% }) %>
+  <div class="card btn-row">
+    <% if (available.length) { %><select name="add_package_id" style="width:auto"><option value="">Add another package…</option><% available.forEach(function (a) { %><option value="<%= a.id %>"><%= a.name %> (<%= money(a.estimated_total) %><%= a.is_sample ? ', sample' : '' %><%= a.is_public ? ', website' : '' %>)</option><% }) %></select><% } %>
+    <button class="btn primary">Save proposal</button>
+  </div>
+</form>
+<% if (p.status === 'Draft' || p.status === 'Sent') { %>
+<form method="post" action="/admin/proposals/<%= p.id %>/send" class="card" onsubmit="return confirm('Publish this proposal? Prices are frozen as quoted and an email draft is created for your review.')">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <h2><%= p.status === 'Sent' ? 'Republish proposal' : 'Send proposal' %></h2>
+  <p class="muted small">Publishing freezes what the customer sees (the original quoted price is preserved), sets the request to Awaiting Customer Selection and drafts the proposal email for you to approve. Internal notes, supplier notes, AI analysis and your cost and margin are never shown to the customer.</p>
+  <button class="btn gold">Publish and draft email</button>
+</form>
+<% } %>
+<%- include('_foot') %>

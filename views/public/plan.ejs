@@ -1,0 +1,24 @@
+<%- include('../partials/header') %>
+<section class="page-hero">
+  <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=2000&q=80')"></div>
+  <div class="wrap">
+    <span class="eyebrow" style="color:#f1d7b3">Plan my trip</span>
+    <h1>Let's plan your vacation</h1>
+    <p>A few details is all it takes. Your travel agent will research flights, resorts and packages and send you hand picked options to choose from.</p>
+  </div>
+</section>
+<section class="section tight">
+  <div class="wrap detail-grid">
+    <div><%- include('../partials/trip-form', { detailed: false }) %></div>
+    <aside class="aside-card">
+      <h3>What happens next</h3>
+      <div class="grid" style="gap:18px">
+        <div class="feature"><span class="num">1</span><div><strong>We research</strong><p class="muted small" style="margin:0">Packages, flights and resorts compared on total cost.</p></div></div>
+        <div class="feature"><span class="num">2</span><div><strong>You review</strong><p class="muted small" style="margin:0">A personal proposal with your best options.</p></div></div>
+        <div class="feature"><span class="num">3</span><div><strong>We confirm and book</strong><p class="muted small" style="margin:0">Only after you choose and we verify the price with you.</p></div></div>
+      </div>
+      <p class="small" style="margin-top:22px">Want to share more detail about hotels, flights and experiences? Use the <a href="/inquiry">detailed custom inquiry</a>.</p>
+    </aside>
+  </div>
+</section>
+<%- include('../partials/footer') %>

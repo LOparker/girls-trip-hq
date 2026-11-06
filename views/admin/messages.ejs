@@ -1,0 +1,8 @@
+<%- include('_head') %>
+<div class="topline"><h1>Contact messages</h1></div>
+<div class="card table-wrap"><table><tr><th>Received</th><th>From</th><th>Message</th><th></th></tr>
+  <% list.forEach(function (m) { %><tr style="<%= m.handled ? 'opacity:.55' : '' %>"><td class="nowrap small"><%= fmtDateTime(m.created_at) %></td><td><%= m.name %><div class="small"><a href="mailto:<%= m.email %>"><%= m.email %></a> <%= m.phone || '' %></div></td>
+    <td><strong><%= m.subject || '' %></strong><div style="white-space:pre-wrap"><%= m.message %></div></td>
+    <td><form method="post" action="/admin/messages/<%= m.id %>/handled"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn small"><%= m.handled ? 'Reopen' : 'Mark handled' %></button></form></td></tr><% }) %>
+  <% if (!list.length) { %><tr><td colspan="4" class="muted">No messages.</td></tr><% } %></table></div>
+<%- include('_foot') %>

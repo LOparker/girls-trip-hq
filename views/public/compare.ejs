@@ -1,0 +1,34 @@
+<%- include('../partials/header') %>
+<section class="plain-hero"><div class="wrap"><span class="eyebrow">Side by side</span><h1 style="font-size:clamp(2rem,4vw,3.2rem)">Compare Packages</h1></div></section>
+<section class="section tight">
+  <div class="wrap">
+    <% if (list.length < 2) { %>
+      <p class="muted">Choose at least two packages to compare. <a href="/packages">Browse packages</a></p>
+    <% } else { %>
+    <div class="compare-wrap">
+      <table class="compare">
+        <thead><tr><th></th><% list.forEach(function (p) { %><th><a href="/packages/<%= p.id %>" style="color:inherit"><%= p.name %></a></th><% }) %></tr></thead>
+        <tbody>
+          <% var rows = [
+            ['Type', function (p) { return PACKAGE_CATEGORIES[p.category]; }],
+            ['Destination', function (p) { return p.destination_name; }],
+            ['Nights', function (p) { return p.nights; }],
+            ['Hotel', function (p) { return p.hotel_name; }],
+            ['Room', function (p) { return p.room_type; }],
+            ['Flights', function (p) { return p.flight_details; }],
+            ['Transportation', function (p) { return p.transportation; }],
+            ['Activities', function (p) { return lines(p.activities).join(', '); }],
+            ['Included', function (p) { return lines(p.inclusions).join(', '); }],
+            ['Not included', function (p) { return lines(p.exclusions).join(', '); }],
+            ['Price per person', function (p) { return p.is_sample ? 'Sample, not a live price' : money(p.estimated_price_pp) + ' (' + p.price_type.toLowerCase() + ')'; }],
+            ['Pricing checked', function (p) { return p.is_sample ? 'n/a' : (fmtDate(p.pricing_checked_at) || 'On request'); }]
+          ]; %>
+          <% rows.forEach(function (r) { %><tr><th><%= r[0] %></th><% list.forEach(function (p) { %><td><%= r[1](p) || '' %></td><% }) %></tr><% }) %>
+          <tr><th></th><% list.forEach(function (p) { %><td><a class="btn btn-primary btn-sm" href="/packages/<%= p.id %>">View details</a></td><% }) %></tr>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+</section>
+<%- include('../partials/footer') %>

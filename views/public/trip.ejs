@@ -1,0 +1,35 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="wrap" style="max-width:860px">
+    <span class="eyebrow">Your trip · <%= r.ref_code %></span>
+    <h1 style="font-size:clamp(2rem,4vw,3.2rem)"><%= r.destination || 'Your vacation' %></h1>
+    <p class="lead">Hi <%= (c.name || '').split(' ')[0] %>, here is the latest on your request.</p>
+    <div class="tracker"><% steps.forEach(function (st, i) { %><div class="<%= s.step > i ? 'done' : '' %>"><%= st %></div><% }) %></div>
+    <div class="form-card">
+      <h3 style="margin-bottom:6px"><%= s.label %></h3>
+      <p class="muted"><%= s.detail %></p>
+      <% if (proposal && proposal.status === 'Sent') { %><a class="btn btn-gold" href="/proposal/<%= proposal.token %>">Review my proposal</a><% } %>
+      <% if (proposal && proposal.status === 'Selected') { %><a class="btn btn-outline" href="/proposal/<%= proposal.token %>">View my selection</a><% } %>
+      <% if (booking) { %>
+        <ul class="info-list" style="margin-top:20px">
+          <li><span>Supplier</span><span><%= booking.supplier %></span></li>
+          <li><span>Confirmation number</span><span><%= booking.confirmation_number %></span></li>
+          <li><span>Travel dates</span><span><%= fmtDate(booking.travel_start) %> to <%= fmtDate(booking.travel_end) %></span></li>
+          <li><span>Total</span><span><%= money(booking.final_price) %></span></li>
+          <li><span>Payment status</span><span><%= booking.payment_status %></span></li>
+        </ul>
+      <% } %>
+    </div>
+    <div class="grid g2" style="margin-top:28px">
+      <div><h4>Your request</h4>
+        <ul class="info-list">
+          <li><span>Travelers</span><span><%= travelersText(r.adults, r.children) %></span></li>
+          <li><span>Dates</span><span><%= r.depart_date ? fmtDate(r.depart_date) + ' to ' + fmtDate(r.return_date) : 'Flexible' %></span></li>
+          <li><span>Departing from</span><span><%= r.departure_airport || 'Not specified' %></span></li>
+        </ul>
+      </div>
+      <div><h4>Questions?</h4><p class="muted">Reply to any of our emails or call <a href="tel:<%= brand.phone.replace(/[^0-9+]/g, '') %>"><%= brand.phone %></a>. Please do not share card numbers by email.</p></div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

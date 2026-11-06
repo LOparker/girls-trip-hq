@@ -1,0 +1,25 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>Travel providers</h1><div class="sub">Where the research assistant looks. "Manual research" providers are listed in each report as links for you to check. Connected adapters are searched automatically. Partner status records any relationship you have actually established.</div></div></div>
+<div class="card table-wrap"><table><tr><th>Provider</th><th>Type</th><th>Adapter</th><th>Integration</th><th>API</th><th>Partner status</th><th>Active</th><th></th></tr>
+  <% list.forEach(function (p) { var a = adapters[p.adapter_key]; %><tr>
+    <td><strong><%= p.name %></strong><div class="small"><a href="<%= p.website %>" target="_blank" rel="noopener"><%= p.website %></a></div></td><td><%= C.PROVIDER_TYPES[p.type] %></td>
+    <td><%= p.adapter_key %><% if (a && a.envVars) { %><div class="small <%= a.isConfigured() ? '' : 'muted' %>"><%= a.isConfigured() ? 'Credentials found' : 'Needs ' + a.envVars.join(', ') %></div><% } %></td>
+    <td><%= p.integration_status %></td><td class="small"><%= p.api_available %></td><td class="small"><%= p.partner_status %></td><td><%= p.active ? 'Yes' : 'No' %></td>
+    <td><% if (user.role === 'owner') { %><details><summary class="small">Edit</summary>
+      <form method="post" action="/admin/providers" style="min-width:300px; margin-top:8px"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="id" value="<%= p.id %>">
+        <div class="fr one"><div><label>Name</label><input type="text" name="name" value="<%= p.name %>"></div></div>
+        <div class="fr two"><div><label>Type</label><select name="type"><% Object.keys(C.PROVIDER_TYPES).forEach(function (k) { %><option value="<%= k %>" <%= p.type === k ? 'selected' : '' %>><%= C.PROVIDER_TYPES[k] %></option><% }) %></select></div>
+          <div><label>Adapter</label><select name="adapter_key"><% Object.keys(adapters).forEach(function (k) { %><option <%= p.adapter_key === k ? 'selected' : '' %>><%= k %></option><% }) %></select></div></div>
+        <div class="fr two"><div><label>Website</label><input type="url" name="website" value="<%= p.website || '' %>"></div><div><label>Booking URL</label><input type="url" name="booking_url" value="<%= p.booking_url || '' %>"></div></div>
+        <div class="fr two"><div><label>Integration status</label><input type="text" name="integration_status" value="<%= p.integration_status %>"></div><div><label>API availability</label><input type="text" name="api_available" value="<%= p.api_available || '' %>"></div></div>
+        <div class="fr one"><div><label>Partner status</label><input type="text" name="partner_status" value="<%= p.partner_status || '' %>"></div></div>
+        <div class="fr one"><div><label>Notes</label><textarea name="notes"><%= p.notes || '' %></textarea></div></div>
+        <label class="check"><input type="checkbox" name="active" value="1" <%= p.active ? 'checked' : '' %>> Active</label><button class="btn small primary">Save</button></form></details><% } %></td></tr><% }) %>
+</table></div>
+<% if (user.role === 'owner') { %>
+<form class="card" method="post" action="/admin/providers"><input type="hidden" name="_csrf" value="<%= csrf %>"><h2>Add provider</h2>
+  <div class="fr four"><div><label>Name</label><input type="text" name="name" required></div><div><label>Type</label><select name="type"><% Object.keys(C.PROVIDER_TYPES).forEach(function (k) { %><option value="<%= k %>"><%= C.PROVIDER_TYPES[k] %></option><% }) %></select></div>
+    <div><label>Website</label><input type="url" name="website"></div><div><label>Adapter</label><select name="adapter_key"><% Object.keys(adapters).forEach(function (k) { %><option <%= k === 'manual' ? 'selected' : '' %>><%= k %></option><% }) %></select></div></div>
+  <input type="hidden" name="active" value="1"><button class="btn primary">Add provider</button></form>
+<% } %>
+<%- include('_foot') %>

@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+<% var preview = typeof preview !== 'undefined' && preview; var r = p.request; %>
+<% if (preview) { %><div class="alert alert-info" style="margin:0; border-radius:0; text-align:center">Agent preview. This is exactly what the customer will see. Selection is disabled in preview.</div><% } %>
+<section class="proposal-head">
+  <div class="wrap">
+    <span class="eyebrow" style="color:#f1d7b3">Prepared for <%= p.customer.name %></span>
+    <h1><%= p.title %></h1>
+    <p><%= p.intro %></p>
+    <p class="small" style="margin-top:18px">
+      <%= travelersText(r.adults, r.children) %><% if (r.depart_date) { %> · <%= fmtDate(r.depart_date) %> to <%= fmtDate(r.return_date) %><% } %><% if (r.departure_airport) { %> · From <%= r.departure_airport %><% } %>
+      <% if (p.valid_until) { %> · Quote valid until <%= fmtDate(p.valid_until) %><% } %>
+    </p>
+  </div>
+</section>
+<section class="section tight">
+  <div class="wrap">
+    <% if (justSelected || p.status === 'Selected') { %>
+      <div class="alert alert-ok" style="font-size:1.02rem">Thank you for selecting your vacation package! Your travel agent will review the details and contact you to confirm current availability, pricing, and the next steps. <strong>Your trip is not booked yet.</strong></div>
+    <% } %>
+    <% p.items.forEach(function (it, idx) { var k = it.pkg; var img = (k.images && k.images[0]) || ''; var chosen = p.selected_item_id === it.id; %>
+    <article class="option <%= it.recommended ? 'recommended' : '' %>">
+      <div class="option-top">
+        <div class="img" style="background-image:url('<%= img %>')">
+          <% if (chosen) { %><span class="ribbon" style="background:var(--sea)">Your selection</span><% } else if (it.recommended) { %><span class="ribbon">Agent's pick</span><% } %>
+        </div>
+        <div class="body">
+          <span class="eyebrow">Option <%= idx + 1 %> · <%= PACKAGE_CATEGORIES[k.category] || 'Vacation package' %></span>
+          <h2 style="font-size:2rem"><%= it.headline || k.name %></h2>
+          <p class="muted"><%= k.summary %></p>
+          <% if (k.description) { %><p><%= k.description %></p><% } %>
+          <% if (it.agent_note) { %><div class="agent-note"><strong>A note from your agent:</strong> <%= it.agent_note %></div><% } %>
+          <ul class="info-list">
+            <li><span>Destination</span><span><%= k.destination %></span></li>
+            <li><span>Travel dates</span><span><%= k.start_date ? fmtDate(k.start_date) + ' to ' + fmtDate(k.end_date) : 'To be confirmed' %></span></li>
+            <% if (k.nights) { %><li><span>Nights</span><span><%= k.nights %></span></li><% } %>
+            <% if (k.provider) { %><li><span>Provider</span><span><%= k.provider %></span></li><% } %>
+          </ul>
+        </div>
+      </div>
+      <div class="option-details">
+        <div><h4>Flights</h4><p><%= k.flight_details || 'Details provided on confirmation' %></p><% if (k.transportation) { %><h4>Transportation</h4><p><%= k.transportation %></p><% } %></div>
+        <div><h4>Hotel</h4><p><strong><%= k.hotel_name %></strong><br><%= k.room_type %></p><% if (k.hotel_details) { %><p class="muted small"><%= k.hotel_details %></p><% } %>
+          <% if (k.activities) { %><h4>Activities</h4><ul class="ticks"><% lines(k.activities).forEach(function (a) { %><li><%= a %></li><% }) %></ul><% } %></div>
+        <div><h4>Included</h4><ul class="ticks"><% lines(k.inclusions).forEach(function (a) { %><li><%= a %></li><% }) %></ul>
+          <h4>Not included</h4><ul class="ticks crosses"><% lines(k.exclusions).forEach(function (a) { %><li><%= a %></li><% }) %></ul></div>
+      </div>
+      <div class="option-foot">
+        <div class="price"><%= money(it.customer_total) %><small><%= money(it.customer_pp) %> per person · Quoted price<% if (it.pricing_checked_at || k.pricing_checked_at) { %>, last checked <%= fmtDate(it.pricing_checked_at || k.pricing_checked_at) %><% } %></small></div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+          <% if (k.booking_url) { %><a class="btn btn-outline btn-sm" href="<%= k.booking_url %>" target="_blank" rel="noopener">Supplier details</a><% } %>
+          <% if (!preview && p.status === 'Sent') { %>
+            <form method="post" action="/proposal/<%= p.token %>/select" onsubmit="return confirm('Select this vacation? Your agent will confirm availability and price with you before anything is booked.')">
+              <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="item_id" value="<%= it.id %>">
+              <button class="btn btn-gold" type="submit">Select This Vacation</button>
+            </form>
+          <% } else if (chosen) { %><span class="btn btn-primary" style="cursor:default">Selected</span><% } %>
+        </div>
+      </div>
+    </article>
+    <% }) %>
+    <div class="grid g2" style="margin-top:10px">
+      <div><h3>Payment and deposits</h3><p class="muted"><%= p.deposit_info || 'Payment details are shared once your agent confirms availability and final pricing with the supplier.' %></p></div>
+      <div><h3>Good to know</h3><p class="muted">Quoted prices reflect availability when last checked and may change until your reservation is confirmed. Selecting a vacation does not book it. Travel insurance is available and recommended. See our <a href="/terms">terms</a>.</p></div>
+    </div>
+    <% if (p.closing_note) { %><div class="agent-note" style="margin-top:24px"><%= p.closing_note %></div><% } %>
+  </div>
+</section>
+<%- include('../partials/footer') %>

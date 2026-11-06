@@ -1,0 +1,17 @@
+<%- include('_head') %>
+<div class="topline"><div><h1><%= C.EMAIL_TEMPLATES[m.template] || 'Email' %></h1><div class="sub"><% if (m.request_id) { %><a href="/admin/requests/<%= m.request_id %>"><%= m.ref_code %> · <%= m.customer_name %></a> · <% } %><span class="pill <%= statusClass(m.status) %>"><%= m.status %></span><%= m.sent_at ? ' · sent ' + fmtDateTime(m.sent_at) : '' %></div></div></div>
+<div class="warn-box">Automatic email delivery is not connected yet. After approving, send it from your email (use "Open in email app" or copy the text), then click "Mark as sent". Never include card numbers.</div>
+<form class="card" method="post"><input type="hidden" name="_csrf" value="<%= csrf %>">
+  <% var locked = ['Sent', 'Discarded', 'Logged'].indexOf(m.status) > -1; %>
+  <div class="fr two"><div><label>To</label><input type="email" name="to_email" value="<%= m.to_email || '' %>" <%= locked ? 'disabled' : '' %>></div><div><label>Subject</label><input type="text" name="subject" value="<%= m.subject || '' %>" <%= locked ? 'disabled' : '' %>></div></div>
+  <div class="fr one"><div><label>Message</label><textarea name="body" id="body" style="min-height:320px" <%= locked ? 'disabled' : '' %>><%= m.body %></textarea></div></div>
+  <% if (!locked) { %><div class="btn-row">
+    <button class="btn" name="action" value="save">Save</button>
+    <% if (m.status === 'Draft') { %><button class="btn primary" name="action" value="approve">Approve</button><% } %>
+    <a class="btn" href="mailto:<%= encodeURIComponent(m.to_email || '') %>?subject=<%= encodeURIComponent(m.subject || '') %>&body=<%= encodeURIComponent(m.body || '') %>">Open in email app</a>
+    <button class="btn" type="button" onclick="navigator.clipboard.writeText(document.getElementById('body').value); this.textContent='Copied'">Copy text</button>
+    <button class="btn gold" name="action" value="sent" onclick="return confirm('Mark this email as sent? Only do this after you have actually sent it.')">Mark as sent</button>
+    <button class="btn danger" name="action" value="discard">Discard</button>
+  </div><% } %>
+</form>
+<%- include('_foot') %>

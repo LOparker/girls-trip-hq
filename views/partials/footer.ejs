@@ -1,0 +1,46 @@
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="/" class="logo"><span class="logo-mark"><%= brand.shortName.charAt(0) %></span><span class="logo-text"><%= brand.shortName %><small style="color:#8695a1">Travel Agency</small></span></a>
+        <p style="margin-top:18px">Personally planned vacations from <%= brand.city %>. You tell us the trip you are dreaming of. We research, compare and take care of the details.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="/destinations">Destinations</a></li>
+          <li><a href="/packages">Vacation packages</a></li>
+          <li><a href="/inspiration">Travel inspiration</a></li>
+          <li><a href="/services">Our services</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Help</h4>
+        <ul>
+          <li><a href="/plan">Plan my trip</a></li>
+          <li><a href="/inquiry">Custom travel inquiry</a></li>
+          <li><a href="/status">Booking status</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/contact">Contact us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Talk to an agent</h4>
+        <ul>
+          <li><a href="tel:<%= brand.phone.replace(/[^0-9+]/g, '') %>"><%= brand.phone %></a></li>
+          <li><a href="mailto:<%= brand.email %>"><%= brand.email %></a></li>
+          <li><%= brand.hours %></li>
+          <li><%= brand.city %></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <%= year %> <%= brand.name %>. All rights reserved.<% if (brand.sellerOfTravel) { %> Seller of Travel <%= brand.sellerOfTravel %>.<% } %></span>
+      <span><a href="/terms">Terms</a> &nbsp;·&nbsp; <a href="/privacy">Privacy</a> &nbsp;·&nbsp; Prices are estimates until confirmed by your agent. Supplier names are listed for reference and do not imply a partnership.</span>
+    </div>
+  </div>
+</footer>
+<script src="/static/js/site.js" defer></script>
+</body>
+</html>

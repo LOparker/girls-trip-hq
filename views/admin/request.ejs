@@ -1,0 +1,130 @@
+<%- include('_head') %>
+<% var c = r.customer; %>
+<div class="topline">
+  <div><h1><%= r.destination || 'Open destination' %> · <%= c.name %></h1>
+    <div class="sub"><%= r.ref_code %> · received <%= fmtDateTime(r.created_at) %> via <%= r.source %> form · <span class="pill <%= statusClass(r.status) %>"><%= r.status %></span></div></div>
+  <form method="post" action="/admin/requests/<%= r.id %>/status" class="btn-row">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <select name="status" style="width:auto"><% C.REQUEST_STATUSES.forEach(function (s) { %><option <%= s === r.status ? 'selected' : '' %>><%= s %></option><% }) %></select>
+    <input type="text" name="note" placeholder="Note (optional)" style="width:180px">
+    <label class="check"><input type="checkbox" name="draft_email" value="1"> Draft email to customer</label>
+    <button class="btn primary">Update status</button>
+  </form>
+</div>
+<div class="cols">
+  <div>
+    <div class="card">
+      <h2>Trip request</h2>
+      <div class="grid g2">
+        <dl class="kv">
+          <dt>Destination</dt><dd><%= r.destination || '—' %><%= r.destination_flexible ? ' (open to suggestions)' : '' %></dd>
+          <dt>Departing from</dt><dd><%= r.departure_airport || '—' %></dd>
+          <dt>Dates</dt><dd><%= r.depart_date ? fmtDate(r.depart_date) + ' to ' + fmtDate(r.return_date) : '—' %><%= r.flexible_dates ? ' (flexible)' : '' %></dd>
+          <dt>Nights</dt><dd><%= nightsBetween(r.depart_date, r.return_date) || '—' %></dd>
+          <dt>Travelers</dt><dd><%= travelersText(r.adults, r.children) %>, <%= r.rooms %> room<%= r.rooms > 1 ? 's' : '' %></dd>
+          <dt>Budget</dt><dd><%= r.budget_total ? money(r.budget_total) + ' total' : '' %><%= r.budget_total && r.budget_per_person ? ' · ' : '' %><%= r.budget_per_person ? money(r.budget_per_person) + ' per person' : '' %><%= !r.budget_total && !r.budget_per_person ? '—' : '' %><%= r.budget_flexible ? ' (flexible)' : '' %></dd>
+        </dl>
+        <dl class="kv">
+          <dt>Style</dt><dd><%= r.vacation_style || '—' %></dd>
+          <dt>Flights</dt><dd><%= [r.flight_pref, r.preferred_airline, r.departure_time_pref, r.baggage].filter(Boolean).join(' · ') || '—' %></dd>
+          <dt>Hotel</dt><dd><%= r.hotelPrefs.join(', ') || '—' %></dd>
+          <dt>Experiences</dt><dd><%= r.exp.join(', ') || '—' %></dd>
+          <dt>Contact by</dt><dd><%= r.contact_pref || 'Email' %></dd>
+        </dl>
+      </div>
+      <% if (r.special_requests) { %><h3 style="margin-top:14px">In the customer's words</h3><pre class="email" style="margin:0"><%= r.special_requests %></pre><% } %>
+    </div>
+
+    <div class="card" id="research">
+      <div class="btn-row" style="justify-content:space-between"><h2 style="margin:0">AI travel research</h2>
+        <a class="btn small" href="/admin/requests/<%= r.id %>/manual-result">Add researched option</a></div>
+      <table style="margin-top:12px">
+        <tr><th>Run</th><th>Started</th><th>Status</th><th>Review</th><th></th></tr>
+        <% runs.forEach(function (x) { %><tr><td>#<%= x.id %><% if (x.instructions) { %><div class="muted small"><%= x.instructions %></div><% } %></td><td><%= fmtDateTime(x.started_at) %></td>
+          <td><%= x.status %><%= x.status === 'running' ? ' (' + x.progress + '%)' : '' %></td><td><span class="pill <%= statusClass(x.decision) %>"><%= x.decision %></span></td>
+          <td class="right"><a class="btn small primary" href="/admin/research/<%= x.id %>">Open report</a></td></tr><% }) %>
+        <% if (!runs.length) { %><tr><td colspan="5" class="muted">No research yet.</td></tr><% } %>
+      </table>
+      <form method="post" action="/admin/requests/<%= r.id %>/research" style="margin-top:14px">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <label for="ins">Instructions for the research assistant (optional)</label>
+        <div class="btn-row" style="flex-wrap:nowrap"><input type="text" id="ins" name="instructions" placeholder="e.g. Focus on Negril, look for resorts with a swim up suite"><button class="btn gold">Start AI research</button></div>
+      </form>
+      <% if (manual.length) { %><h3 style="margin-top:16px">Options you researched by hand</h3><table><% manual.forEach(function (m) { %>
+        <tr><td><%= m.result_type %></td><td><%= m.title %><div class="muted small"><%= m.provider_name %> · retrieved <%= fmtDateTime(m.retrieved_at) %></div></td><td class="right"><%= money(m.price_total) %></td><td><span class="pill <%= statusClass(m.review_status) %>"><%= m.review_status %></span></td></tr><% }) %></table><% } %>
+    </div>
+
+    <div class="card" id="packages">
+      <div class="btn-row" style="justify-content:space-between"><h2 style="margin:0">Packages for this customer</h2><a class="btn small" href="/admin/packages/new?request=<%= r.id %>">Create package manually</a></div>
+      <p class="muted small">Build packages from research options (open a report and choose "Create package"), or create them manually. Then tick the ones to present and build a proposal.</p>
+      <form method="post" action="/admin/requests/<%= r.id %>/proposals">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <table>
+          <tr><th></th><th>Package</th><th>Type</th><th>Price</th><th>Status</th><th></th></tr>
+          <% packages.forEach(function (p) { %><tr><td><input type="checkbox" name="package_ids" value="<%= p.id %>"></td>
+            <td><%= p.name %><div class="muted small"><%= p.hotel_name %></div></td><td><%= PACKAGE_CATEGORIES[p.category] %></td>
+            <td class="nowrap"><%= money(p.estimated_total) %> <span class="pill <%= p.is_sample ? 'sample' : '' %>"><%= p.price_type %></span></td>
+            <td><span class="pill <%= statusClass(p.status) %>"><%= p.status %></span></td><td class="right"><a class="btn small" href="/admin/packages/<%= p.id %>/edit">Edit</a></td></tr><% }) %>
+          <% if (!packages.length) { %><tr><td colspan="6" class="muted">No packages yet.</td></tr><% } %>
+        </table>
+        <% if (packages.length) { %><button class="btn primary" style="margin-top:12px">Build proposal from selected</button><% } %>
+      </form>
+      <% if (proposals.length) { %><h3 style="margin-top:18px">Proposals</h3><table><% proposals.forEach(function (p) { %>
+        <tr><td><a href="/admin/proposals/<%= p.id %>"><%= p.title %></a></td><td><span class="pill <%= statusClass(p.status) %>"><%= p.status %></span></td><td><%= p.sent_at ? 'Sent ' + fmtDate(p.sent_at) : 'Not sent' %></td>
+          <td class="right"><% if (p.status !== 'Draft') { %><a class="small" href="/proposal/<%= p.token %>" target="_blank">Customer link</a><% } %></td></tr><% }) %></table><% } %>
+    </div>
+
+    <% if (selected) { %>
+    <div class="card" style="border:2px solid var(--gold)">
+      <h2>Customer selected a package</h2>
+      <p><strong><%= selected.pkg.name %></strong> · quoted <%= money(selected.customer_total) %> (<%= money(selected.customer_pp) %> pp) · selected <%= fmtDateTime(selected.selected_at) %></p>
+      <p class="muted small">Pricing last checked: <%= fmtDateTime(selected.pricing_checked_at) || 'not recorded' %>. This is not a booking. Re-check price and availability with the supplier before reserving.</p>
+      <% if (selected.customer_message) { %><pre class="email"><%= selected.customer_message %></pre><% } %>
+      <% if (!bookings.length) { %><form method="post" action="/admin/requests/<%= r.id %>/bookings"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn gold">Start booking (I will book this personally)</button></form><% } %>
+    </div>
+    <% } %>
+
+    <div class="card">
+      <div class="btn-row" style="justify-content:space-between"><h2 style="margin:0">Bookings</h2>
+        <% if (!selected && !bookings.length) { %><form method="post" action="/admin/requests/<%= r.id %>/bookings"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn small">Start booking without proposal</button></form><% } %></div>
+      <table style="margin-top:10px"><% bookings.forEach(function (b) { %><tr><td><a href="/admin/bookings/<%= b.id %>">Booking #<%= b.id %></a></td><td><%= b.supplier || '—' %></td><td><%= b.confirmation_number || 'No confirmation yet' %></td>
+        <td><span class="pill <%= statusClass(b.booking_status) %>"><%= b.booking_status %></span></td><td><%= b.payment_status %></td></tr><% }) %>
+        <% if (!bookings.length) { %><tr><td class="muted">No booking started.</td></tr><% } %></table>
+    </div>
+
+    <div class="card" id="comms">
+      <h2>Communications</h2>
+      <div class="grid g2">
+        <form method="post" action="/admin/requests/<%= r.id %>/communications"><input type="hidden" name="_csrf" value="<%= csrf %>">
+          <label>Draft an email from a template</label>
+          <div class="btn-row" style="flex-wrap:nowrap"><select name="template"><% Object.keys(C.EMAIL_TEMPLATES).forEach(function (k) { %><option value="<%= k %>"><%= C.EMAIL_TEMPLATES[k] %></option><% }) %></select><button class="btn">Draft</button></div></form>
+        <form method="post" action="/admin/requests/<%= r.id %>/communications"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="direction" value="Log">
+          <label>Log a call, text or email you received</label>
+          <div class="btn-row" style="flex-wrap:nowrap"><select name="channel" style="width:110px"><option>Call</option><option>Text</option><option>Email in</option><option>Meeting</option></select><input type="text" name="body" placeholder="What was discussed" required><button class="btn">Log</button></div></form>
+      </div>
+      <table style="margin-top:12px"><% comms.forEach(function (m) { %><tr><td class="nowrap small"><%= fmtDateTime(m.created_at) %></td><td><%= m.direction %></td>
+        <td><% if (m.direction === 'Outgoing') { %><a href="/admin/communications/<%= m.id %>"><%= m.subject %></a><% } else { %><%= m.body %><% } %></td><td><span class="pill <%= statusClass(m.status) %>"><%= m.status %></span></td></tr><% }) %></table>
+    </div>
+
+    <div class="card" id="notes">
+      <h2>Internal notes</h2>
+      <form method="post" action="/admin/requests/<%= r.id %>/notes"><input type="hidden" name="_csrf" value="<%= csrf %>"><textarea name="body" placeholder="Private notes for you and your team"></textarea><button class="btn" style="margin-top:8px">Add note</button></form>
+      <ul class="timeline" style="margin-top:10px"><% notes.forEach(function (n) { %><li><%= n.body %><div class="muted small"><%= n.user_name || 'System' %> · <%= fmtDateTime(n.created_at) %></div></li><% }) %></ul>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <h2>Customer</h2>
+      <p style="margin:0"><a href="/admin/customers/<%= c.id %>"><strong><%= c.name %></strong></a></p>
+      <p style="margin:4px 0"><a href="mailto:<%= c.email %>"><%= c.email %></a></p>
+      <% if (c.phone) { %><p style="margin:4px 0"><a href="tel:<%= c.phone %>"><%= c.phone %></a></p><% } %>
+      <p class="small"><a href="/trip/<%= r.access_token %>" target="_blank">Customer status page</a></p>
+      <% if (previous.length) { %><h3 style="margin-top:14px">Previous inquiries</h3><ul class="timeline"><% previous.forEach(function (p) { %><li><a href="/admin/requests/<%= p.id %>"><%= p.ref_code %></a> · <%= p.destination || 'Open' %> · <%= p.status %></li><% }) %></ul><% } %>
+    </div>
+    <div class="card">
+      <h2>Status history</h2>
+      <ul class="timeline"><% history.forEach(function (h) { %><li><strong><%= h.to_status %></strong><% if (h.note) { %> · <%= h.note %><% } %><div class="muted small"><%= h.user_name || 'System' %> · <%= fmtDateTime(h.created_at) %></div></li><% }) %></ul>
+    </div>
+  </div>
+</div>
+<%- include('_foot') %>

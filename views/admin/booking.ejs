@@ -1,0 +1,64 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>Booking #<%= b.id %> · <%= b.customer_name %></h1>
+  <div class="sub"><a href="/admin/requests/<%= b.request_id %>"><%= b.ref_code %> · <%= b.destination %></a> · <span class="pill <%= statusClass(b.booking_status) %>"><%= b.booking_status %></span> · <%= b.customer_email %><%= b.customer_phone ? ' · ' + b.customer_phone : '' %></div></div></div>
+<div class="warn-box">You complete every reservation yourself through the supplier's website or agent portal. This page records what you booked. The customer is only told the trip is confirmed after you press "Confirm reservation" below.</div>
+<div class="cols">
+  <div>
+    <% if (b.pkg) { %><div class="card"><h2>What the customer selected</h2>
+      <p style="margin:0"><strong><%= b.pkg.name %></strong> · quoted <%= money(b.quoted_total) %> · pricing last checked <%= b.quoted_at ? fmtDateTime(b.quoted_at) : 'not recorded' %></p>
+      <p class="small muted" style="margin:6px 0 0"><%= b.pkg.hotel_name %>, <%= b.pkg.room_type %> · <%= b.pkg.flight_details %></p></div><% } %>
+    <form class="card" method="post" action="/admin/bookings/<%= b.id %>" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <h2>Reservation details</h2>
+      <div class="fr">
+        <div><label>Supplier</label><input type="text" name="supplier" value="<%= b.supplier || '' %>" placeholder="e.g. Delta Vacations"></div>
+        <div><label>Booking website or agent portal</label><input type="text" name="booking_portal" value="<%= b.booking_portal || '' %>"></div>
+        <div><label>Confirmation number</label><input type="text" name="confirmation_number" value="<%= b.confirmation_number || '' %>"></div>
+      </div>
+      <div class="fr four">
+        <div><label>Final confirmed price (USD)</label><input type="number" step="0.01" name="final_price" value="<%= b.final_price == null ? '' : b.final_price %>"></div>
+        <div><label>Booking date</label><input type="date" name="booking_date" value="<%= b.booking_date || '' %>"></div>
+        <div><label>Travel start</label><input type="date" name="travel_start" value="<%= b.travel_start || '' %>"></div>
+        <div><label>Travel end</label><input type="date" name="travel_end" value="<%= b.travel_end || '' %>"></div>
+      </div>
+      <div class="fr two">
+        <div><label>Hotel information</label><textarea name="hotel_info"><%= b.hotel_info || '' %></textarea></div>
+        <div><label>Flight information</label><textarea name="flight_info"><%= b.flight_info || '' %></textarea></div>
+        <div><label>Customer notes</label><textarea name="customer_notes"><%= b.customer_notes || '' %></textarea></div>
+        <div><label>Internal notes</label><textarea name="internal_notes"><%= b.internal_notes || '' %></textarea></div>
+      </div>
+      <div class="fr two">
+        <div><label>Payment status</label><select name="payment_status"><% C.PAYMENT_STATUSES.forEach(function (s) { %><option <%= b.payment_status === s ? 'selected' : '' %>><%= s %></option><% }) %></select></div>
+        <div><label>Supplier confirmation documents (PDF or image, private)</label><input type="file" name="documents" multiple accept=".pdf,image/*,.doc,.docx,.txt"></div>
+      </div>
+      <% if (b.quoted_total != null && b.final_price != null && b.final_price != b.quoted_total) { %><div class="warn-box">Final price differs from the quoted price by <%= money(b.final_price - b.quoted_total) %>. Make sure the customer approved the change.</div><% } %>
+      <button class="btn primary">Save details</button>
+    </form>
+    <% if (b.booking_status === 'In Progress') { %>
+    <form class="card" method="post" action="/admin/bookings/<%= b.id %>/confirm"><input type="hidden" name="_csrf" value="<%= csrf %>">
+      <h2>Confirm reservation</h2>
+      <p class="muted small">Requires a saved supplier, final price and confirmation number.</p>
+      <label class="check"><input type="checkbox" name="attest" value="1"> I personally completed this reservation with the supplier and received their confirmation.</label>
+      <button class="btn gold" style="margin-top:10px">Mark as Confirmed and draft confirmation email</button>
+    </form>
+    <% } %>
+    <div class="card" id="payments"><h2>Payments</h2>
+      <% if (['Confirmed', 'Completed', 'Cancelled'].indexOf(b.booking_status) === -1) { %><p class="muted small">Payments are only recorded after the reservation is confirmed. Never collect money for an unconfirmed booking.</p><% } else { %>
+      <form method="post" action="/admin/bookings/<%= b.id %>/payments" class="fr four" style="align-items:end"><input type="hidden" name="_csrf" value="<%= csrf %>">
+        <div><label>Type</label><select name="kind"><option>Deposit</option><option>Balance</option><option>Payment</option><option>Refund</option></select></div>
+        <div><label>Amount</label><input type="number" step="0.01" name="amount" required></div><div><label>Date</label><input type="date" name="paid_on"></div>
+        <div><label>Method / reference (no card numbers)</label><input type="text" name="method_note"></div><div><button class="btn">Record</button></div></form><% } %>
+      <table><% payments.forEach(function (x) { %><tr><td><%= fmtDate(x.paid_on || x.created_at) %></td><td><%= x.kind %></td><td class="right"><%= money(x.amount, { cents: true }) %></td><td><%= x.method_note || '' %></td></tr><% }) %></table>
+    </div>
+  </div>
+  <div>
+    <div class="card"><h2>Documents</h2><ul class="timeline"><% docs.forEach(function (d) { %><li><a href="/admin/bookings/<%= b.id %>/docs/<%= d.id %>"><%= d.original_name %></a><div class="muted small"><%= fmtDateTime(d.uploaded_at) %></div></li><% }) %>
+      <% if (!docs.length) { %><li class="muted">None uploaded.</li><% } %></ul></div>
+    <div class="card"><h2>Close out</h2>
+      <% if (b.booking_status === 'Confirmed') { %><form method="post" action="/admin/bookings/<%= b.id %>/status"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="booking_status" value="Completed"><button class="btn">Mark trip completed</button></form><% } %>
+      <% if (b.booking_status !== 'Cancelled') { %><form method="post" action="/admin/bookings/<%= b.id %>/status" style="margin-top:10px" onsubmit="return confirm('Cancel this booking record? Cancel with the supplier separately.')"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="booking_status" value="Cancelled">
+        <input type="text" name="note" placeholder="Reason" style="margin-bottom:6px"><button class="btn danger">Cancel booking</button></form><% } %>
+    </div>
+  </div>
+</div>
+<%- include('_foot') %>

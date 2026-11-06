@@ -1,0 +1,135 @@
+<%- include('_head') %>
+<% var optById = {}; grouped.option.forEach(function (o) { optById[o.id] = o; });
+   var catFor = function (label) { return /Budget/.test(label) ? 'budget' : /Premium/.test(label) ? 'luxury' : 'best'; }; %>
+<div class="topline">
+  <div><h1>Research report #<%= run.id %></h1>
+    <div class="sub"><a href="/admin/requests/<%= r.id %>"><%= r.ref_code %> · <%= r.customer.name %></a> · started <%= fmtDateTime(run.started_at) %><% if (run.instructions) { %> · "<%= run.instructions %>"<% } %>
+    <% if (report) { %> · <span class="pill <%= /Sample/.test(report.data_quality) ? 'sample' : '' %>"><%= report.data_quality %></span><% } %></div>
+    <div class="muted small">Private. Only you and authorized staff can see this report.</div></div>
+  <form method="post" action="/admin/research/<%= run.id %>/decision" class="btn-row">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <select name="decision" style="width:auto"><% ['Pending review', 'Approved', 'Rejected', 'Needs more research'].forEach(function (d) { %><option <%= run.decision === d ? 'selected' : '' %>><%= d %></option><% }) %></select>
+    <input type="text" name="review_notes" value="<%= run.review_notes || '' %>" placeholder="Review notes" style="width:200px"><button class="btn">Save review</button>
+  </form>
+</div>
+
+<% if (run.status !== 'completed') { %>
+<div class="card" id="progressCard">
+  <h2><%= run.status === 'failed' ? 'Research failed' : 'Researching…' %></h2>
+  <div class="progress"><div id="pbar" style="width:<%= run.progress %>%"></div></div>
+  <div class="log" id="plog" style="margin-top:12px"><% log.forEach(function (l) { %><div><%= l.msg %></div><% }) %></div>
+</div>
+<% if (run.status === 'running') { %><script>
+(function poll() { fetch('/admin/research/<%= run.id %>/status.json').then(function (r) { return r.json(); }).then(function (d) {
+  document.getElementById('pbar').style.width = d.progress + '%';
+  document.getElementById('plog').innerHTML = d.log.map(function (l) { var x = document.createElement('div'); x.textContent = l.msg; return x.outerHTML; }).join('');
+  if (d.status === 'running') setTimeout(poll, 1200); else location.reload();
+}).catch(function () { setTimeout(poll, 3000); }); })();
+</script><% } %>
+<% } %>
+
+<% if (report) { var cr = report.customer_request; %>
+<div class="top-rec">
+  <div class="lbl">AI's top recommendation</div>
+  <p><%= report.top_recommendation %></p>
+  <% if (report.ai_summary) { %><div style="margin-top:14px; padding-top:14px; border-top:1px solid #2d4152; white-space:pre-wrap; color:#d6dee4; font-size:.95rem"><%= report.ai_summary %></div><% } %>
+</div>
+<% if (report.warnings.length) { %><div class="warn-box"><strong>Before you quote</strong><ul><% report.warnings.forEach(function (w) { %><li><%= w %></li><% }) %></ul></div><% } %>
+
+<div class="card">
+  <h2>Customer request</h2>
+  <div class="grid g2">
+    <dl class="kv">
+      <dt>Customer</dt><dd><%= cr.customer %></dd><dt>Destination</dt><dd><%= cr.destination || 'Open' %><% if (cr.destination_ideas) { %><div class="muted small">Ideas: <%= cr.destination_ideas.join(', ') %></div><% } %></dd>
+      <dt>Departing from</dt><dd><%= cr.departure_airport || '—' %></dd><dt>Dates</dt><dd><%= cr.dates %> (<%= cr.nights %> nights)<%= cr.flexible_dates ? ', flexible' : '' %></dd>
+      <dt>Travelers</dt><dd><%= cr.travelers %>, <%= cr.rooms %> room(s)</dd><dt>Budget</dt><dd><%= cr.budget %></dd>
+    </dl>
+    <dl class="kv">
+      <dt>Preferences</dt><dd><%= cr.preferences.join(', ') || '—' %></dd><dt>Flights</dt><dd><%= cr.flight.join(', ') || '—' %></dd>
+      <dt>Experiences</dt><dd><%= cr.experiences.join(', ') || '—' %></dd><dt>Occasion</dt><dd><%= cr.occasion || '—' %></dd>
+      <dt>Special requests</dt><dd><%= cr.special_requests || '—' %></dd>
+      <% if (cr.inferred && cr.inferred.length) { %><dt>Read from notes</dt><dd><%= cr.inferred.join('; ') %></dd><% } %>
+    </dl>
+  </div>
+</div>
+
+<div class="grid g3" style="margin-bottom:20px">
+<% report.recommendations.forEach(function (rec, i) { var opt = optById[rec.result_id] || { review_status: 'Pending' }; %>
+  <div class="rec <%= i === 0 ? 'top' : '' %>">
+    <div class="muted small" style="font-weight:800; text-transform:uppercase; letter-spacing:.06em"><%= rec.label %></div>
+    <h3><%= rec.title %> <% if (rec.is_sample) { %><span class="pill sample">SAMPLE</span><% } %></h3>
+    <div class="small muted"><%= rec.kind %> · <%= rec.provider %> · score <%= rec.score.total %>/100</div>
+    <p class="small" style="margin:10px 0"><%= rec.why %></p>
+    <dl class="kv small" style="grid-template-columns:90px 1fr">
+      <% if (rec.flight && rec.flight.airline) { %><dt>Flight</dt><dd><%= rec.flight.airline %>, <%= rec.flight.stops === 0 ? 'nonstop' : rec.flight.stops + ' stop(s)' %>, <%= rec.flight.duration || '' %><div class="muted"><%= rec.flight.outbound || '' %> · <%= rec.flight.cabin || '' %></div></dd><% } %>
+      <% if (rec.hotel && rec.hotel.name) { %><dt>Hotel</dt><dd><%= rec.hotel.name %><div class="muted"><%= [rec.hotel.stars ? rec.hotel.stars + '★' : '', rec.hotel.guest_rating ? rec.hotel.guest_rating + '/10' : '', rec.hotel.all_inclusive ? 'All-inclusive' : '', rec.hotel.adults_only ? 'Adults-only' : '', rec.hotel.beachfront ? 'Beachfront' : ''].filter(Boolean).join(' · ') %></div></dd>
+        <dt>Room</dt><dd><%= rec.hotel.room_type %></dd><% } %>
+      <dt>Includes</dt><dd><%= (rec.inclusions || []).join(', ') %></dd>
+    </dl>
+    <table class="cost" style="margin-top:10px">
+      <% rec.costs.forEach(function (c) { %><tr><td><%= c.label %></td><td class="right"><%= money(c.amount) %></td></tr><% }) %>
+      <tr class="total"><td>Total estimate</td><td class="right"><%= money(rec.total) %></td></tr>
+      <tr><td class="muted">Per person</td><td class="right muted"><%= money(rec.per_person) %></td></tr>
+      <% if (rec.within_budget === false) { %><tr><td colspan="2" style="color:var(--danger); font-weight:700">Over budget by <%= money(rec.budget_diff) %></td></tr><% } else if (rec.within_budget) { %><tr><td colspan="2" style="color:var(--ok); font-weight:700">Within budget</td></tr><% } %>
+    </table>
+    <div class="small muted" style="margin-top:8px"><% rec.sources.forEach(function (s) { %><div><%= s.provider %>: <%= s.url ? '' : 'no link' %><% if (s.url) { %><a href="<%= s.url %>" target="_blank" rel="noopener">booking link</a><% } %> · <%= s.availability %> · retrieved <%= fmtDateTime(s.retrieved_at) %></div><% }) %></div>
+    <div class="btn-row" style="margin-top:12px">
+      <span class="pill <%= statusClass(opt.review_status) %>"><%= opt.review_status %></span>
+      <form method="post" action="/admin/results/<%= rec.result_id %>/review"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="review_status" value="Approved"><button class="btn small">Approve</button></form>
+      <form method="post" action="/admin/results/<%= rec.result_id %>/review"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="review_status" value="Rejected"><button class="btn small danger">Reject</button></form>
+      <% if (!converted.has(rec.result_id)) { %><form method="post" action="/admin/results/<%= rec.result_id %>/to-package"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="category" value="<%= catFor(rec.label) %>"><button class="btn small primary">Create package</button></form><% } else { %><span class="small muted">Package created</span><% } %>
+    </div>
+  </div>
+<% }) %>
+</div>
+
+<% if (report.analysis) { var a = report.analysis; %>
+<div class="card"><h2>AI decision analysis</h2>
+  <dl class="kv" style="grid-template-columns:220px 1fr">
+    <dt>Best match for requirements</dt><dd><%= a.best_match %></dd><dt>Best overall value</dt><dd><%= a.best_value %></dd>
+    <dt>Most affordable</dt><dd><%= a.most_affordable %></dd><dt>Best accommodations</dt><dd><%= a.best_accommodations %></dd>
+    <dt>Most convenient flights</dt><dd><%= a.most_convenient_flights %></dd><dt>Most included benefits</dt><dd><%= a.most_benefits %></dd>
+    <dt>Budget check</dt><dd><%= a.over_budget %></dd>
+  </dl></div>
+<% } %>
+
+<div class="grid g2">
+  <div class="card"><h2>Bundle versus booking separately</h2>
+    <table><tr><th>Hotel</th><th class="right">Bundle</th><th class="right">Separate</th><th>Cheaper</th></tr>
+    <% report.bundle_vs_separate.forEach(function (b) { %><tr><td><%= b.hotel %><div class="muted small"><%= b.note %></div></td><td class="right"><%= money(b.bundle.total) %></td><td class="right"><%= money(b.separate.total) %></td><td><strong><%= b.cheaper %></strong> by <%= money(b.difference) %></td></tr><% }) %>
+    <% if (!report.bundle_vs_separate.length) { %><tr><td colspan="4" class="muted">No hotel was available both as a bundle and separately.</td></tr><% } %></table></div>
+  <div class="card"><h2>Providers searched</h2>
+    <table><% report.providers_searched.forEach(function (p) { %><tr><td><%= p.provider %></td><td><%= p.status %></td><td class="right"><%= p.results %> results</td></tr><% }) %></table>
+    <% if (report.manual_checks.length) { %><h3 style="margin-top:14px">Check manually (no API connected)</h3><p class="small muted">Price these yourself in the supplier's site or agent portal, then use "Add researched option".</p>
+      <div class="small"><% report.manual_checks.forEach(function (m, i) { %><a href="<%= m.url %>" target="_blank" rel="noopener"><%= m.provider %></a><%= i < report.manual_checks.length - 1 ? ' · ' : '' %><% }) %></div><% } %>
+    <p class="small" style="margin-top:12px"><a href="/admin/requests/<%= r.id %>/manual-result">Add researched option</a></p></div>
+</div>
+
+<% if (report.activities.length) { %><div class="card"><h2>Suggested activities and excursions</h2><table><tr><th>Activity</th><th>Duration</th><th class="right">Per person</th></tr>
+  <% report.activities.forEach(function (a) { %><tr><td><%= a.title %> <% if (a.is_sample) { %><span class="pill sample">SAMPLE</span><% } %></td><td><%= a.duration %></td><td class="right"><%= money(a.price_pp) %></td></tr><% }) %></table></div><% } %>
+
+<div class="card"><h2>All <%= grouped.option.length %> options compared</h2><div class="table-wrap"><table>
+  <tr><th>Option</th><th>Type</th><th>Stops</th><th>Hotel</th><th class="right">Total</th><th class="right">Score</th><th>Review</th><th></th></tr>
+  <% grouped.option.forEach(function (o) { var d = o.data; %><tr>
+    <td><%= o.title %> <% if (o.is_sample) { %><span class="pill sample">SAMPLE</span><% } %><div class="muted small"><%= o.provider_name %></div></td><td><%= d.kind %></td><td><%= d.flight ? d.flight.stops : '' %></td>
+    <td class="small"><%= d.hotel ? [d.hotel.stars ? d.hotel.stars + '★' : '', d.hotel.all_inclusive ? 'AI' : '', d.hotel.adults_only ? 'Adults' : '', d.hotel.beachfront ? 'Beach' : ''].filter(Boolean).join(' · ') : '' %></td>
+    <td class="right"><%= money(o.price_total) %><% if (d.within_budget === false) { %><div class="small" style="color:var(--danger)">over</div><% } %></td><td class="right"><%= d.score ? d.score.total : '' %></td>
+    <td><span class="pill <%= statusClass(o.review_status) %>"><%= o.review_status %></span></td>
+    <td class="nowrap"><% if (!converted.has(o.id)) { %><form method="post" action="/admin/results/<%= o.id %>/to-package" style="display:inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn small">Create package</button></form><% } %>
+      <form method="post" action="/admin/results/<%= o.id %>/review" style="display:inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="review_status" value="Rejected"><button class="btn small danger">Reject</button></form></td></tr><% }) %>
+</table></div></div>
+
+<div class="grid g2">
+  <div class="card"><h2>Flight options</h2><table><tr><th>Airline</th><th>Stops</th><th>Times</th><th class="right">Fare pp</th><th class="right">Bag</th></tr>
+    <% grouped.flight.forEach(function (f) { var d = f.data; %><tr><td><%= d.airline %><div class="muted small"><%= d.cabin || '' %> · <%= d.change_policy || '' %></div></td><td><%= d.stops %></td><td class="small"><%= d.duration %><div class="muted"><%= d.outbound %></div></td><td class="right"><%= money(d.fare_pp) %></td><td class="right"><%= money(d.baggage_fee_pp, { empty: '—' }) %></td></tr><% }) %></table></div>
+  <div class="card"><h2>Hotel options</h2><table><tr><th>Hotel</th><th class="right">Nightly</th><th class="right">Taxes + fees</th><th class="right">Stay total</th></tr>
+    <% grouped.hotel.forEach(function (h) { var d = h.data; %><tr><td><%= d.name %><div class="muted small"><%= d.room_type %> · <%= d.cancellation || '' %></div></td><td class="right"><%= money(d.nightly_rate) %></td><td class="right"><%= money((d.taxes || 0) + (d.resort_fees || 0)) %></td><td class="right"><%= money(h.price_total) %></td></tr><% }) %></table></div>
+</div>
+
+<div class="card"><h2>Request additional research</h2>
+  <form method="post" action="/admin/requests/<%= r.id %>/research"><input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="btn-row" style="flex-wrap:nowrap"><input type="text" name="instructions" placeholder="What should the assistant look at next? e.g. Compare Ocho Rios resorts, the customer now prefers a morning flight"><button class="btn gold">Run again</button></div></form>
+  <details class="box" style="margin-top:12px"><summary>Research log</summary><div class="log"><% log.forEach(function (l) { %><div><%= fmtDateTime(l.at) %> · <%= l.msg %></div><% }) %></div></details>
+</div>
+<% } %>
+<%- include('_foot') %>

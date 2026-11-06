@@ -1,0 +1,53 @@
+<%- include('../partials/header') %>
+<section class="plain-hero">
+  <div class="wrap">
+    <span class="eyebrow"><%= PACKAGE_CATEGORIES[p.category] %> · <%= p.destination_name %></span>
+    <h1 style="font-size:clamp(2rem,4vw,3.2rem)"><%= p.name %></h1>
+    <p class="lead"><%= p.summary %></p>
+  </div>
+</section>
+<section class="section tight">
+  <div class="wrap">
+    <% var imgs = p.images.length ? p.images : (d ? [d.image] : []); %>
+    <% if (imgs.length) { %>
+    <div class="gallery">
+      <img src="<%= imgs[0] %>" alt="<%= p.name %>">
+      <% if (imgs.length > 1) { %><div class="side"><% imgs.slice(1, 3).forEach(function (i) { %><img src="<%= i %>" alt="" loading="lazy"><% }) %></div><% } %>
+    </div>
+    <% } %>
+    <div class="detail-grid">
+      <div>
+        <% if (p.is_sample) { %><div class="notice" style="margin-bottom:28px">This is a sample package that shows how we present vacations. It is not a live offer. Your agent will research real, current options for your dates.</div><% } %>
+        <% if (p.description) { %><div class="block"><p class="lead"><%= p.description %></p></div><% } %>
+        <div class="grid g2 block">
+          <div><h3>Hotel</h3><p><strong><%= p.hotel_name %></strong><br><%= p.room_type %></p><% if (p.hotel_details) { %><p class="muted small"><%= p.hotel_details %></p><% } %></div>
+          <div><h3>Flights</h3><p><%= p.flight_details || 'Flights quoted from your home airport' %></p></div>
+          <% if (p.activities) { %><div><h3>Activities</h3><ul class="ticks"><% lines(p.activities).forEach(function (a) { %><li><%= a %></li><% }) %></ul></div><% } %>
+          <% if (p.transportation) { %><div><h3>Transportation</h3><p><%= p.transportation %></p></div><% } %>
+          <% if (p.dining) { %><div><h3>Dining</h3><p><%= p.dining %></p></div><% } %>
+        </div>
+        <div class="grid g2 block">
+          <div><h3>What's included</h3><ul class="ticks"><% lines(p.inclusions).forEach(function (a) { %><li><%= a %></li><% }) %></ul></div>
+          <div><h3>Not included</h3><ul class="ticks crosses"><% lines(p.exclusions).forEach(function (a) { %><li><%= a %></li><% }) %></ul></div>
+        </div>
+      </div>
+      <aside class="aside-card">
+        <div class="price" style="margin-bottom:16px">
+          <% if (p.is_sample) { %>Sample package<small>Illustration only, not a live price</small>
+          <% } else if (p.estimated_price_pp) { %><%= money(p.estimated_price_pp) %><small><%= p.price_type %> price per person<% if (p.pricing_checked_at) { %>, last checked <%= fmtDate(p.pricing_checked_at) %><% } %></small>
+          <% } else { %>Price on request<% } %>
+        </div>
+        <ul class="info-list" style="margin-bottom:18px">
+          <% if (p.nights) { %><li><span>Length</span><span><%= p.nights %> nights</span></li><% } %>
+          <% if (p.start_date) { %><li><span>Travel dates</span><span><%= fmtDate(p.start_date) %> to <%= fmtDate(p.end_date) %></span></li><% } %>
+          <% if (!p.is_sample && p.estimated_total) { %><li><span>Total estimate</span><span><%= money(p.estimated_total) %> for <%= p.travelers %></span></li><% } %>
+          <% if (p.provider && !p.is_sample) { %><li><span>Provider</span><span><%= p.provider %></span></li><% } %>
+          <% if (p.booking_source && !p.is_sample) { %><li><span>Booking source</span><span><%= p.booking_source %></span></li><% } %>
+        </ul>
+        <a href="/inquiry?destination=<%= encodeURIComponent(p.destination_name || '') %>&special_requests=<%= encodeURIComponent('I am interested in the package: ' + p.name) %>" class="btn btn-gold btn-block">Request This Package</a>
+        <p class="muted small" style="margin-top:14px">Prices change with dates and availability. Your agent confirms the current price before anything is booked.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

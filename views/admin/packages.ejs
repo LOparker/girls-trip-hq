@@ -1,0 +1,11 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>Packages</h1><div class="sub">Public packages appear on the website. Custom packages belong to one customer and are shown only in their proposal.</div></div><a class="btn primary" href="/admin/packages/new">New package</a></div>
+<div class="tabs"><a href="?scope=all" class="<%= scope === 'all' ? 'on' : '' %>">All</a><a href="?scope=public" class="<%= scope === 'public' ? 'on' : '' %>">Public website</a><a href="?scope=custom" class="<%= scope === 'custom' ? 'on' : '' %>">Customer packages</a></div>
+<div class="card table-wrap"><table><tr><th>Package</th><th>Type</th><th>For</th><th class="right">Estimate</th><th>Pricing</th><th>Status</th><th></th></tr>
+  <% list.forEach(function (p) { %><tr><td><a href="/admin/packages/<%= p.id %>/edit"><%= p.name %></a><div class="muted small"><%= p.destination_name %></div></td><td><%= PACKAGE_CATEGORIES[p.category] %></td>
+    <td><%= p.is_public ? 'Website' : (p.customer_name ? p.customer_name + ' · ' + p.ref_code : 'Custom') %></td><td class="right"><%= money(p.estimated_total) %></td>
+    <td><span class="pill <%= p.is_sample ? 'sample' : '' %>"><%= p.price_type %></span><div class="muted small"><%= p.pricing_checked_at ? 'checked ' + fmtDate(p.pricing_checked_at) : '' %></div></td>
+    <td><span class="pill <%= statusClass(p.status) %>"><%= p.status %></span></td>
+    <td class="right"><form method="post" action="/admin/packages/<%= p.id %>/toggle"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn small"><%= p.status === 'Active' ? 'Deactivate' : 'Activate' %></button></form></td></tr><% }) %>
+</table></div>
+<%- include('_foot') %>

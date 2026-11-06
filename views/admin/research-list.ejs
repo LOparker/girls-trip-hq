@@ -1,0 +1,13 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>AI travel research</h1><div class="sub">Your research assistant prepares a private report for every new request. It researches and recommends. It never books, reserves or charges anything.</div></div></div>
+<% if (!aiEnabled) { %><div class="warn-box">AI writing is off. Reports still run using rule based reading and scoring. Set <code>ANTHROPIC_API_KEY</code> before starting the server to have Claude read free text requests and write plain language summaries.</div><% } %>
+<div class="card"><h2>Requests waiting on research or review</h2>
+  <table><tr><th>Ref</th><th>Customer</th><th>Destination</th><th>Status</th><th></th></tr>
+  <% queue.forEach(function (r) { %><tr><td><a href="/admin/requests/<%= r.id %>"><%= r.ref_code %></a></td><td><%= r.customer_name %></td><td><%= r.destination || 'Open' %></td><td><span class="pill <%= statusClass(r.status) %>"><%= r.status %></span></td>
+    <td class="right"><form method="post" action="/admin/requests/<%= r.id %>/research"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn small gold">Run research</button></form></td></tr><% }) %>
+  <% if (!queue.length) { %><tr><td colspan="5" class="muted">All caught up.</td></tr><% } %></table></div>
+<div class="card"><h2>All research runs</h2>
+  <table><tr><th>Run</th><th>Request</th><th>Started</th><th>Status</th><th>Review</th></tr>
+  <% list.forEach(function (x) { %><tr><td><a href="/admin/research/<%= x.id %>">#<%= x.id %></a></td><td><%= x.ref_code %> · <%= x.customer_name %> · <%= x.destination || 'Open' %></td><td><%= fmtDateTime(x.started_at) %></td><td><%= x.status %></td><td><span class="pill <%= statusClass(x.decision) %>"><%= x.decision %></span></td></tr><% }) %>
+  </table></div>
+<%- include('_foot') %>

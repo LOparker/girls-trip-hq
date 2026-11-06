@@ -1,0 +1,8 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>Communications</h1><div class="sub">Every customer email is drafted here first. Review, edit and approve before it goes out.</div></div></div>
+<div class="tabs"><% ['', 'Draft', 'Approved', 'Sent', 'Logged', 'Discarded'].forEach(function (s) { %><a href="/admin/communications<%= s ? '?status=' + s : '' %>" class="<%= status === s ? 'on' : '' %>"><%= s || 'All' %></a><% }) %></div>
+<div class="card table-wrap"><table><tr><th>Created</th><th>Customer</th><th>Type</th><th>Subject</th><th>Status</th></tr>
+  <% list.forEach(function (m) { %><tr><td class="nowrap small"><%= fmtDateTime(m.created_at) %></td><td><%= m.customer_name %><div class="muted small"><%= m.ref_code %></div></td><td><%= C.EMAIL_TEMPLATES[m.template] || m.direction %></td>
+    <td><% if (m.direction === 'Outgoing') { %><a href="/admin/communications/<%= m.id %>"><%= m.subject %></a><% } else { %><%= m.body %><% } %></td><td><span class="pill <%= statusClass(m.status) %>"><%= m.status %></span></td></tr><% }) %>
+  <% if (!list.length) { %><tr><td colspan="5" class="muted">Nothing here.</td></tr><% } %></table></div>
+<%- include('_foot') %>

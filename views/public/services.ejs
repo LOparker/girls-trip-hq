@@ -1,0 +1,45 @@
+<%- include('../partials/header') %>
+<section class="plain-hero">
+  <div class="wrap"><span class="eyebrow">Our services</span><h1 style="font-size:clamp(2rem,4vw,3.2rem)">Everything your trip needs, handled by one agent</h1>
+    <p class="lead">From the first idea to the welcome home message, here is how we help.</p></div>
+</section>
+<section class="section">
+  <div class="wrap grid g3">
+    <% [
+      ['All-inclusive and beach vacations', 'Caribbean and Mexico resorts compared on what is really included, from drinks and dining to transfers and tips.', 'photo-1520250497591-112f2f40a3f4'],
+      ['Romantic getaways and honeymoons', 'Adults-only resorts, overwater villas and special touches for birthdays, anniversaries and honeymoons.', 'photo-1439066615861-d1af74d74000'],
+      ['Family vacations', 'Kid friendly resorts, connecting rooms, kids clubs and flights that work with nap times.', 'photo-1614179982824-a5739f6e83b8'],
+      ['International travel', 'Multi city itineraries across Europe and Asia with trains, transfers and guided tours arranged.', 'photo-1499856871958-5b9627545d1a'],
+      ['Cruises', 'Ocean and river cruises matched to your style, with pre and post cruise hotel stays.', 'photo-1548574505-5e239809ee19'],
+      ['Group travel', 'Destination weddings, family reunions and friend trips with one point of contact for everyone.', 'photo-1530789253388-582c481c54b0']
+    ].forEach(function (s) { %>
+      <article class="card reveal">
+        <div class="card-img" style="background-image:url('https://images.unsplash.com/<%= s[2] %>?auto=format&fit=crop&w=900&q=80')"></div>
+        <div class="card-body"><h3><%= s[0] %></h3><p class="muted"><%= s[1] %></p></div>
+      </article>
+    <% }) %>
+  </div>
+</section>
+<section class="section sand">
+  <div class="wrap split">
+    <div class="reveal">
+      <span class="eyebrow">Included with every trip</span>
+      <h2>What working with us looks like</h2>
+      <ul class="ticks">
+        <li>Research across airline vacation packages, online travel providers, airlines and hotels</li>
+        <li>A full cost comparison of bundled packages versus booking separately</li>
+        <li>A personalized proposal with hand picked options</li>
+        <li>Booking handled personally by your agent once you approve</li>
+        <li>Excursion and transfer recommendations</li>
+        <li>Pre-departure reminders and document checklists</li>
+        <li>Travel insurance options explained in plain language</li>
+      </ul>
+    </div>
+    <div class="form-card reveal">
+      <h3>Service fees</h3>
+      <p class="muted">Any planning or service fee is shown clearly in your proposal before you decide. You will never be charged for a reservation that has not been confirmed.</p>
+      <a href="/plan" class="btn btn-gold">Start planning</a>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

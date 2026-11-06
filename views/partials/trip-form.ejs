@@ -1,0 +1,102 @@
+<%
+  var v = function (k, d) { return q && q[k] != null && q[k] !== '' ? q[k] : (d == null ? '' : d); };
+  var has = function (k, val) { var x = q && q[k]; return Array.isArray(x) ? x.indexOf(val) > -1 : x === val; };
+  var sel = function (k, val) { return v(k) === val ? 'selected' : ''; };
+%>
+<form class="form-card" action="/inquiry" method="post" novalidate>
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <input type="hidden" name="source" value="<%= detailed ? 'inquiry' : 'plan' %>">
+  <div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+  <% if (typeof errors !== 'undefined' && errors && errors.length) { %><div class="alert alert-error"><% errors.forEach(function (e) { %><div><%= e %></div><% }) %></div><% } %>
+
+  <div class="form-section">
+    <h3>Travel details</h3>
+    <p>Where and when you would like to go.</p>
+    <div class="form-row two">
+      <div>
+        <label for="f-dest">Destination</label>
+        <input type="text" id="f-dest" name="destination" list="dest-list-f" value="<%= v('destination') %>" placeholder="Type a destination or choose one">
+        <datalist id="dest-list-f"><% destinations.forEach(function (d) { %><option value="<%= d.name %>"><% }) %></datalist>
+        <label class="check" style="margin-top:10px"><input type="checkbox" name="destination_flexible" value="1" data-flex-dest="f-dest" <%= v('destination_flexible') ? 'checked' : '' %>> I'm flexible. Help me find somewhere to go.</label>
+      </div>
+      <div><label for="f-from">Departure airport</label><input type="text" id="f-from" name="departure_airport" value="<%= v('departure_airport') %>" placeholder="e.g. Dallas Fort Worth (DFW)"></div>
+    </div>
+    <div class="form-row">
+      <div><label for="f-dep">Departure date</label><input type="date" id="f-dep" name="depart_date" value="<%= v('depart_date') %>"></div>
+      <div><label for="f-ret">Return date</label><input type="date" id="f-ret" name="return_date" value="<%= v('return_date') %>"></div>
+      <div><label for="f-flex">Flexible travel dates?</label>
+        <select id="f-flex" name="flexible_dates"><option value="no">No, these dates</option><option value="yes" <%= sel('flexible_dates', 'yes') %>>Yes, a few days either way</option></select></div>
+    </div>
+    <div class="form-row">
+      <div><label for="f-ad">Adults</label><input type="number" id="f-ad" name="adults" min="1" max="30" value="<%= v('adults', 2) %>"></div>
+      <div><label for="f-ch">Children</label><input type="number" id="f-ch" name="children" min="0" max="20" value="<%= v('children', 0) %>"></div>
+      <div><label for="f-rm">Rooms</label><input type="number" id="f-rm" name="rooms" min="1" max="20" value="<%= v('rooms', 1) %>"></div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>Budget</h3>
+    <p>A rough number helps us focus on options you will love. Fill in either one.</p>
+    <div class="form-row">
+      <div><label for="f-bpp">Budget per person (USD)</label><input type="number" id="f-bpp" name="budget_per_person" min="0" step="50" value="<%= v('budget_per_person') %>" placeholder="e.g. 2000"></div>
+      <div><label for="f-btot">Total vacation budget (USD)</label><input type="number" id="f-btot" name="budget_total" min="0" step="100" value="<%= v('budget_total') %>" placeholder="e.g. 5000"></div>
+      <div><label for="f-bflex">Is the budget flexible?</label>
+        <select id="f-bflex" name="budget_flexible"><option value="no">Please stay within it</option><option value="yes" <%= sel('budget_flexible', 'yes') %>>A little flexible for the right trip</option></select></div>
+    </div>
+    <div class="form-row two">
+      <div><label for="f-style">Vacation style</label>
+        <select id="f-style" name="vacation_style"><option value="">Any style</option><% C.VACATION_STYLES.forEach(function (s) { %><option <%= sel('vacation_style', s) %>><%= s %></option><% }) %></select></div>
+      <div><label for="f-fl">Flight preference</label>
+        <select id="f-fl" name="flight_pref"><% C.FLIGHT_PREFS.forEach(function (s) { %><option <%= sel('flight_pref', s) %>><%= s %></option><% }) %></select></div>
+    </div>
+  </div>
+
+  <% if (detailed) { %>
+  <div class="form-section">
+    <h3>Flight preferences</h3>
+    <div class="form-row">
+      <div><label for="f-air">Preferred airline, if any</label><input type="text" id="f-air" name="preferred_airline" value="<%= v('preferred_airline') %>" placeholder="e.g. American, Delta"></div>
+      <div><label for="f-time">Preferred departure time</label>
+        <select id="f-time" name="departure_time_pref"><% C.DEPARTURE_TIMES.forEach(function (s) { %><option <%= sel('departure_time_pref', s) %>><%= s %></option><% }) %></select></div>
+      <div><label for="f-bag">Baggage</label>
+        <select id="f-bag" name="baggage"><% C.BAGGAGE.forEach(function (s) { %><option <%= sel('baggage', s) %>><%= s %></option><% }) %></select></div>
+    </div>
+  </div>
+  <div class="form-section">
+    <h3>Hotel preferences</h3>
+    <p>Choose any that matter to you.</p>
+    <div class="chips" style="margin-top:14px"><% C.HOTEL_PREFS.forEach(function (s) { %>
+      <label class="chip"><input type="checkbox" name="hotel_prefs" value="<%= s %>" <%= has('hotel_prefs', s) ? 'checked' : '' %>><span><%= s %></span></label><% }) %></div>
+  </div>
+  <div class="form-section">
+    <h3>Vacation experience</h3>
+    <p>What would make this trip feel perfect?</p>
+    <div class="chips" style="margin-top:14px"><% C.EXPERIENCES.forEach(function (s) { %>
+      <label class="chip"><input type="checkbox" name="experiences" value="<%= s %>" <%= has('experiences', s) ? 'checked' : '' %>><span><%= s %></span></label><% }) %></div>
+  </div>
+  <% } %>
+
+  <div class="form-section">
+    <h3>Tell us exactly what you want</h3>
+    <p>Describe the trip in your own words. Celebrations, must haves, things to avoid, anything at all.</p>
+    <textarea name="special_requests" rows="5" style="margin-top:12px" placeholder="For example: I want to go to Jamaica for my birthday. I want a nice all-inclusive resort, preferably adults-only. I would like a nonstop flight if possible. My budget is $2,000 per person."><%= v('special_requests') %></textarea>
+  </div>
+
+  <div class="form-section">
+    <h3>Your contact details</h3>
+    <div class="form-row">
+      <div><label for="f-name">Full name *</label><input type="text" id="f-name" name="name" required autocomplete="name" value="<%= v('name') %>"></div>
+      <div><label for="f-email">Email *</label><input type="email" id="f-email" name="email" required autocomplete="email" value="<%= v('email') %>"></div>
+      <div><label for="f-phone">Phone</label><input type="tel" id="f-phone" name="phone" autocomplete="tel" value="<%= v('phone') %>"></div>
+    </div>
+    <div class="form-row two">
+      <div><label for="f-cp">Best way to reach you</label>
+        <select id="f-cp" name="contact_pref"><option>Email</option><option <%= sel('contact_pref', 'Phone call') %>>Phone call</option><option <%= sel('contact_pref', 'Text message') %>>Text message</option></select></div>
+    </div>
+    <label class="check" style="margin-top:18px"><input type="checkbox" name="consent" value="1" <%= v('consent') ? 'checked' : '' %>> I agree to be contacted about this trip and accept the <a href="/privacy" target="_blank">privacy policy</a>.</label>
+  </div>
+  <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-top:10px">
+    <p class="muted small" style="margin:0">Submitting a request is free and does not book or charge anything.</p>
+    <button class="btn btn-gold" type="submit">Send My Request</button>
+  </div>
+</form>

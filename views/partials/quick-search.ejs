@@ -1,0 +1,39 @@
+<form class="search-panel" action="/plan" method="get" id="search">
+  <span class="eyebrow">Quick vacation search</span>
+  <h3>Tell us about your trip</h3>
+  <p class="muted small" style="margin:0">Share the basics and a travel agent will research the best options for you. No obligation, nothing is booked without your approval.</p>
+  <div class="search-grid">
+    <div class="span2">
+      <label for="qs-dest">Where would you like to go?</label>
+      <input type="text" id="qs-dest" name="destination" list="dest-list" placeholder="Type a destination or choose one" value="<%= typeof preset !== 'undefined' ? preset : '' %>">
+      <datalist id="dest-list"><% destinations.forEach(function (d) { %><option value="<%= d.name %>"><% }) %></datalist>
+      <label class="check" style="margin-top:10px"><input type="checkbox" name="destination_flexible" value="1" data-flex-dest="qs-dest"> I'm flexible. Help me find somewhere to go.</label>
+    </div>
+    <div>
+      <label for="qs-from">Departure city or airport</label>
+      <input type="text" id="qs-from" name="departure_airport" placeholder="e.g. Dallas (DFW)">
+    </div>
+    <div>
+      <label for="qs-style">Preferred vacation style</label>
+      <select id="qs-style" name="vacation_style"><option value="">Any style</option><% C.VACATION_STYLES.forEach(function (s) { %><option><%= s %></option><% }) %></select>
+    </div>
+    <div><label for="qs-dep">Departure date</label><input type="date" id="qs-dep" name="depart_date"></div>
+    <div><label for="qs-ret">Return date</label><input type="date" id="qs-ret" name="return_date"></div>
+    <div>
+      <label for="qs-flex">Are your dates flexible?</label>
+      <select id="qs-flex" name="flexible_dates"><option value="no">No, these dates</option><option value="yes">Yes, a few days either way</option></select>
+    </div>
+    <div>
+      <label for="qs-budget">Estimated budget per person</label>
+      <input type="number" id="qs-budget" name="budget_per_person" min="0" step="50" placeholder="e.g. 2000">
+    </div>
+    <div><label for="qs-ad">Adults</label><input type="number" id="qs-ad" name="adults" min="1" max="30" value="2"></div>
+    <div><label for="qs-ch">Children</label><input type="number" id="qs-ch" name="children" min="0" max="20" value="0"></div>
+    <div><label for="qs-rm">Rooms</label><input type="number" id="qs-rm" name="rooms" min="1" max="20" value="1"></div>
+    <div>
+      <label for="qs-fl">Flight preference</label>
+      <select id="qs-fl" name="flight_pref"><% C.FLIGHT_PREFS.forEach(function (s) { %><option><%= s %></option><% }) %></select>
+    </div>
+  </div>
+  <div style="margin-top:22px; display:flex; justify-content:flex-end"><button class="btn btn-gold" type="submit">Find My Vacation</button></div>
+</form>

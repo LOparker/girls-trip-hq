@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="wrap center" style="max-width:760px">
+    <span class="eyebrow">Request received</span>
+    <h1 style="font-size:clamp(2.2rem,4vw,3.4rem)">Thank you. Your trip is in good hands.</h1>
+    <p class="lead">Your travel agent has your request<% if (r.destination) { %> for <strong><%= r.destination %></strong><% } %> and will start researching options for you. Nothing has been booked or charged.</p>
+    <div class="form-card" style="margin:34px auto; text-align:left; max-width:520px">
+      <ul class="info-list">
+        <li><span>Reference number</span><span><%= r.ref_code %></span></li>
+        <li><span>Travelers</span><span><%= travelersText(r.adults, r.children) %></span></li>
+        <% if (r.depart_date) { %><li><span>Dates</span><span><%= fmtDate(r.depart_date) %> to <%= fmtDate(r.return_date) %></span></li><% } %>
+      </ul>
+      <p class="small muted" style="margin:16px 0 0">Save this page or your reference number. You can check the status of your request any time.</p>
+    </div>
+    <a href="/trip/<%= r.access_token %>" class="btn btn-primary">View my request status</a>
+    <a href="/destinations" class="btn btn-outline" style="margin-left:8px">Keep exploring</a>
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,7 @@
+<%- include('_head') %>
+<div class="topline"><h1>Notifications</h1></div>
+<div class="card"><ul class="timeline">
+  <% list.forEach(function (n) { %><li><% if (!n.is_read) { %><span class="pill sample">New</span> <% } %><% if (n.link) { %><a href="<%= n.link %>"><%= n.message %></a><% } else { %><%= n.message %><% } %> <span class="muted small">· <%= fmtDateTime(n.created_at) %></span></li><% }) %>
+  <% if (!list.length) { %><li class="muted">No notifications.</li><% } %>
+</ul></div>
+<%- include('_foot') %>

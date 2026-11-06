@@ -1,0 +1,12 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>Team</h1><div class="sub">Owners manage providers and team members. Staff can work requests, research, proposals and bookings.</div></div></div>
+<div class="card"><table><tr><th>Name</th><th>Email</th><th>Role</th><th>Active</th><th></th></tr>
+  <% list.forEach(function (u) { %><tr><td><%= u.name %></td><td><%= u.email %></td><td><%= u.role %></td><td><%= u.active ? 'Yes' : 'No' %></td>
+    <td><% if (u.id !== user.id) { %><form method="post" action="/admin/users/<%= u.id %>/toggle"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn small"><%= u.active ? 'Deactivate' : 'Reactivate' %></button></form><% } %></td></tr><% }) %></table></div>
+<form class="card" method="post" action="/admin/users"><input type="hidden" name="_csrf" value="<%= csrf %>"><h2>Add team member</h2>
+  <% if (error) { %><div class="flash error"><%= error %></div><% } %>
+  <div class="fr four"><div><label>Name</label><input type="text" name="name" required></div><div><label>Email</label><input type="email" name="email" required></div>
+    <div><label>Temporary password (10+ characters)</label><input type="password" name="password" minlength="10" required autocomplete="new-password"></div>
+    <div><label>Role</label><select name="role"><option value="staff">Staff</option><option value="owner">Owner</option></select></div></div>
+  <button class="btn primary">Add</button></form>
+<%- include('_foot') %>

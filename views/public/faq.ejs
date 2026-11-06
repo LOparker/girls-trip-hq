@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+<section class="plain-hero"><div class="wrap"><span class="eyebrow">FAQ</span><h1 style="font-size:clamp(2rem,4vw,3.2rem)">Frequently Asked Questions</h1></div></section>
+<section class="section tight">
+  <div class="wrap prose">
+    <% [
+      ['How does planning with you work?', 'You tell us where and when you want to travel, your budget and what matters to you. Your agent researches packages, flights and hotels, then sends you a personalized proposal with a few hand picked options. Once you choose, your agent confirms current availability and pricing with you and books it personally.'],
+      ['Does it cost anything to request a quote?', 'No. Requests and proposals are free. If a service or planning fee applies to your trip, it is shown clearly in your proposal before you decide.'],
+      ['Is my trip booked when I select a package?', 'No. Selecting a vacation tells your agent which option you want. Your agent then confirms availability and the final price with you. Your trip is booked only when you receive a confirmation with a confirmation number.'],
+      ['Why might the price change after I receive a proposal?', 'Airfare and hotel rates change constantly with availability. Proposals show the price when it was last checked. Your agent verifies the current price before booking and will always tell you if anything has changed.'],
+      ['Do you compare package deals and booking separately?', 'Yes. We compare bundled vacation packages with booking flights and hotels individually, and we add up the complete cost including taxes, resort fees, baggage and transfers where that information is available.'],
+      ['How do payments work?', 'Payment details are only requested after your reservation is confirmed with the supplier. We never ask for card numbers by email.'],
+      ['Should I buy travel insurance?', 'We recommend it, especially for international trips and travel during hurricane season. Your agent can explain the options available for your trip.'],
+      ['What documents do I need?', 'Requirements depend on your destination and citizenship. Most international trips need a passport valid for at least six months beyond your return. Always check official government sources before you travel.'],
+      ['Are you partnered with the airlines and hotels you mention?', 'Supplier and brand names on this site are listed to describe where we research and book. They do not imply a partnership or endorsement unless we state one.'],
+      ['How can I check on my request?', 'Use the Booking Status page with the reference number from your confirmation email, or simply reply to any email from your agent.']
+    ].forEach(function (f) { %>
+      <details class="faq"><summary><%= f[0] %></summary><p><%= f[1] %></p></details>
+    <% }) %>
+    <p style="margin-top:40px">Still have a question? <a href="/contact">Contact us</a> and we will be happy to help.</p>
+  </div>
+</section>
+<%- include('../partials/footer') %>

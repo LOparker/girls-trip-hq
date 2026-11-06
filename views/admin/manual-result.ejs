@@ -1,0 +1,42 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>Add a researched option</h1><div class="sub">For <a href="/admin/requests/<%= r.id %>"><%= r.ref_code %> · <%= r.customer.name %></a>. Use this for anything you priced yourself: agent portals, supplier calls, airline vacation sites. The research assistant includes it in the next comparison.</div></div></div>
+<form class="card" method="post">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <div class="fr">
+    <div><label>Option type</label><select name="result_type"><option value="package">Bundled package (flight + hotel)</option><option value="flight">Flight only</option><option value="hotel">Hotel only</option><option value="activity">Activity / excursion</option></select></div>
+    <div><label>Title</label><input type="text" name="title" placeholder="e.g. AA Vacations: Hyatt Zilara Rose Hall" required></div>
+    <div><label>Provider</label><input type="text" name="provider_name" list="provs" placeholder="Where you found it"><datalist id="provs"><% providers.forEach(function (p) { %><option value="<%= p.name %>"><% }) %></datalist></div>
+  </div>
+  <div class="fr four">
+    <div><label>Total price for the group (USD)</label><input type="number" step="0.01" name="price_total"></div>
+    <div><label>Source URL</label><input type="url" name="source_url" placeholder="https://"></div>
+    <div><label>Price retrieved at</label><input type="datetime-local" name="retrieved_at"></div>
+    <div><label>Availability</label><input type="text" name="availability_status" value="Available when checked"></div>
+  </div>
+  <details class="box" open><summary>Flight details</summary>
+    <div class="fr four" style="margin-top:10px">
+      <div><label>Airline</label><input type="text" name="airline"></div><div><label>Stops</label><input type="number" name="stops" min="0" max="3"></div>
+      <div><label>Duration</label><input type="text" name="duration" placeholder="3h 40m"></div><div><label>Fare per person</label><input type="number" step="0.01" name="fare_pp"></div>
+      <div><label>Outbound</label><input type="text" name="outbound" placeholder="Departs 8:15a, arrives 12:55p"></div><div><label>Return</label><input type="text" name="inbound"></div>
+      <div><label>Bag fee per bag, round trip</label><input type="number" step="0.01" name="baggage_fee_pp"></div><div><label>Seat fee per person</label><input type="number" step="0.01" name="seat_fee_pp"></div>
+      <div><label>Cancellation policy</label><input type="text" name="flight_cancellation"></div><div><label>Change policy</label><input type="text" name="change_policy"></div>
+    </div></details>
+  <details class="box" open><summary>Hotel details</summary>
+    <div class="fr four" style="margin-top:10px">
+      <div><label>Hotel name</label><input type="text" name="hotel_name"></div><div><label>Room type</label><input type="text" name="room_type"></div>
+      <div><label>Stars</label><input type="number" step="0.5" name="stars" min="1" max="5"></div><div><label>Guest rating (out of 10, verified)</label><input type="number" step="0.1" name="guest_rating"></div>
+      <div><label>Nightly rate</label><input type="number" step="0.01" name="nightly_rate"></div><div><label>Nights</label><input type="number" name="nights"></div>
+      <div><label>Room total</label><input type="number" step="0.01" name="room_total"></div><div><label>Taxes</label><input type="number" step="0.01" name="taxes"></div>
+      <div><label>Resort fees (total)</label><input type="number" step="0.01" name="resort_fees"></div><div><label>Transfers (estimate)</label><input type="number" step="0.01" name="transfer_estimate"></div>
+      <div><label>Cancellation policy</label><input type="text" name="cancellation"></div><div><label>Amenities (comma separated)</label><input type="text" name="amenities"></div>
+    </div>
+    <div class="btn-row"><label class="check"><input type="checkbox" name="all_inclusive"> All-inclusive</label><label class="check"><input type="checkbox" name="adults_only"> Adults-only</label>
+      <label class="check"><input type="checkbox" name="family_friendly"> Family-friendly</label><label class="check"><input type="checkbox" name="beachfront"> Beachfront</label><label class="check"><input type="checkbox" name="transfers_included"> Transfers included (packages)</label></div>
+  </details>
+  <details class="box"><summary>Package inclusions, exclusions and activity details</summary>
+    <div class="fr two" style="margin-top:10px"><div><label>Inclusions (one per line)</label><textarea name="inclusions"></textarea></div><div><label>Exclusions (one per line)</label><textarea name="exclusions"></textarea></div></div>
+    <div class="fr two"><div><label>Activity price per person</label><input type="number" step="0.01" name="activity_pp"></div><div><label>Notes</label><input type="text" name="notes"></div></div>
+  </details>
+  <button class="btn primary" style="margin-top:12px">Save option</button>
+</form>
+<%- include('_foot') %>

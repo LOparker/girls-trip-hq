@@ -1,0 +1,21 @@
+<%- include('../partials/header') %>
+<%# Starting template only. Have these terms reviewed by an attorney and updated with your host agency and seller of travel details before launch. %>
+<section class="plain-hero"><div class="wrap"><span class="eyebrow">Legal</span><h1 style="font-size:clamp(2rem,4vw,3rem)">Terms and Conditions</h1></div></section>
+<section class="section tight"><div class="wrap prose">
+  <p><%= brand.name %> ("we") acts as a travel agent arranging travel services provided by third party suppliers such as airlines, hotels, tour operators and vacation package companies. We do not own or operate these services.</p>
+  <h2>Quotes and pricing</h2>
+  <p>Prices in proposals are quotes based on availability at the time they were checked and are not guaranteed until a reservation is confirmed by the supplier. Selecting a package in a proposal is a request to book, not a confirmed booking.</p>
+  <h2>Bookings</h2>
+  <p>Your reservation is confirmed only when we provide a supplier confirmation number. Supplier terms, including cancellation, change and refund rules, apply to every booking and will be shared with you before you pay.</p>
+  <h2>Payments</h2>
+  <p>We do not collect payment for unconfirmed reservations. Deposits and final payments follow the supplier's schedule. Service or planning fees, if any, are disclosed in your proposal.</p>
+  <h2>Cancellations and refunds</h2>
+  <p>Cancellations and refunds are governed by the supplier's policies. Our service fees may be non-refundable once services have been performed, as disclosed in your proposal.</p>
+  <h2>Travel documents and insurance</h2>
+  <p>Travelers are responsible for valid passports, visas and entry requirements. We strongly recommend travel insurance and can provide options.</p>
+  <h2>Supplier names</h2>
+  <p>Supplier and brand names are used to describe where we research and book travel. Their use does not imply a partnership, endorsement or affiliation unless expressly stated.</p>
+  <% if (brand.sellerOfTravel) { %><h2>Registration</h2><p>Seller of Travel registration: <%= brand.sellerOfTravel %>.</p><% } %>
+  <p class="muted small">Questions about these terms? <a href="/contact">Contact us</a>.</p>
+</div></section>
+<%- include('../partials/footer') %>

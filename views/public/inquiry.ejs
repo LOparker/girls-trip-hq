@@ -1,0 +1,12 @@
+<%- include('../partials/header') %>
+<section class="plain-hero">
+  <div class="wrap">
+    <span class="eyebrow">Custom travel inquiry</span>
+    <h1 style="font-size:clamp(2rem,4vw,3.2rem)">Design your perfect vacation</h1>
+    <p class="lead">The more you tell us, the better we can match flights, hotels and experiences to you. Only your name and email are required.</p>
+  </div>
+</section>
+<section class="section tight">
+  <div class="wrap" style="max-width:960px"><%- include('../partials/trip-form', { detailed: true }) %></div>
+</section>
+<%- include('../partials/footer') %>

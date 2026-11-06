@@ -1,0 +1,27 @@
+<%- include('../partials/header') %>
+<section class="plain-hero">
+  <div class="wrap">
+    <span class="eyebrow">Vacation packages</span>
+    <h1>Vacation Packages</h1>
+    <p class="lead">Starting points for your next trip. Select up to four to compare side by side, or ask your agent to build one around your exact dates.</p>
+  </div>
+</section>
+<section class="section tight">
+  <div class="wrap">
+    <form method="get" class="form-row four" style="margin:0 0 30px; align-items:end">
+      <div><label for="pd">Destination</label><select id="pd" name="destination"><option value="">All destinations</option><% destinations.forEach(function (d) { %><option value="<%= d.slug %>" <%= dest === d.slug ? 'selected' : '' %>><%= d.name %></option><% }) %></select></div>
+      <div><label for="pc">Package type</label><select id="pc" name="category"><option value="">All types</option><% Object.keys(PACKAGE_CATEGORIES).forEach(function (k) { %><option value="<%= k %>" <%= cat === k ? 'selected' : '' %>><%= PACKAGE_CATEGORIES[k] %></option><% }) %></select></div>
+      <div><button class="btn btn-primary" type="submit">Filter</button></div>
+    </form>
+    <% if (list.some(function (p) { return p.is_sample; })) { %>
+      <div class="notice" style="margin-bottom:28px">Packages marked Sample show how our packages are presented. They are not live offers or prices. Request a quote and your agent will research current options for your dates.</div>
+    <% } %>
+    <% if (list.length) { %>
+      <div class="grid g3"><% list.forEach(function (p) { %><%- include('../partials/package-card', { p: p, compare: true }) %><% }) %></div>
+    <% } else { %>
+      <p class="muted">No packages match those filters yet. <a href="/plan">Tell us about your trip</a> and we will build options for you.</p>
+    <% } %>
+  </div>
+</section>
+<div class="compare-bar" id="compareBar"><span><strong id="compareCount">0</strong> selected</span><a id="compareGo" class="btn btn-gold btn-sm" href="#">Compare packages</a></div>
+<%- include('../partials/footer') %>

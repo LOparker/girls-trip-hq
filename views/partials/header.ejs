@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title ? title + ' | ' + brand.name : brand.name + ' | ' + brand.tagline %></title>
+  <meta name="description" content="<%= typeof metaDescription !== 'undefined' ? metaDescription : 'Personally planned vacations. Tell us where you want to go and a dedicated travel agent researches, compares and books the details for you.' %>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/site.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23142433'/><text x='32' y='42' font-size='30' text-anchor='middle' fill='%23b9874b' font-family='Georgia'>H</text></svg>">
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap">
+    <span><%= brand.hours %></span>
+    <span><a href="tel:<%= brand.phone.replace(/[^0-9+]/g, '') %>"><%= brand.phone %></a> &nbsp;·&nbsp; <a href="mailto:<%= brand.email %>"><%= brand.email %></a> &nbsp;·&nbsp; <a href="/status">Check booking status</a></span>
+  </div>
+</div>
+<header class="site-header">
+  <div class="wrap">
+    <a href="/" class="logo" aria-label="<%= brand.name %> home">
+      <span class="logo-mark"><%= brand.shortName.charAt(0) %></span>
+      <span class="logo-text"><%= brand.shortName %><small>Travel Agency</small></span>
+    </a>
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" data-menu>&#9776;</button>
+    <nav class="nav" id="nav">
+      <a href="/destinations" class="<%= path.startsWith('/destinations') ? 'active' : '' %>">Destinations</a>
+      <a href="/packages" class="<%= path.startsWith('/packages') ? 'active' : '' %>">Packages</a>
+      <a href="/services" class="<%= path === '/services' ? 'active' : '' %>">Services</a>
+      <a href="/inspiration" class="<%= path === '/inspiration' ? 'active' : '' %>">Inspiration</a>
+      <a href="/about" class="<%= path === '/about' ? 'active' : '' %>">About</a>
+      <a href="/contact" class="<%= path === '/contact' ? 'active' : '' %>">Contact</a>
+      <a href="/plan" class="btn btn-primary btn-sm">Plan My Vacation</a>
+    </nav>
+  </div>
+</header>
+<main>

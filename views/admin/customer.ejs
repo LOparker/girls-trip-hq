@@ -1,0 +1,29 @@
+<%- include('_head') %>
+<div class="topline"><div><h1><%= c.name %></h1><div class="sub">Customer since <%= fmtDate(c.created_at) %></div></div></div>
+<div class="cols">
+  <div>
+    <div class="card"><h2>Trip requests</h2><table><tr><th>Ref</th><th>Destination</th><th>Dates</th><th>Status</th></tr>
+      <% requests.forEach(function (r) { %><tr><td><a href="/admin/requests/<%= r.id %>"><%= r.ref_code %></a></td><td><%= r.destination || 'Open' %></td><td><%= fmtDate(r.depart_date) %></td><td><span class="pill <%= statusClass(r.status) %>"><%= r.status %></span></td></tr><% }) %></table></div>
+    <div class="card"><h2>Selected packages</h2><table><% selections.forEach(function (s) { %><tr><td><%= s.ref_code %></td><td><%= s.pkg.name %></td><td><%= money(s.customer_total) %></td><td><%= fmtDateTime(s.selected_at) %></td></tr><% }) %>
+      <% if (!selections.length) { %><tr><td class="muted">None yet.</td></tr><% } %></table></div>
+    <div class="card"><h2>Booking history</h2><table><tr><th>Booking</th><th>Destination</th><th>Supplier</th><th>Confirmation</th><th>Status</th></tr>
+      <% bookings.forEach(function (b) { %><tr><td><a href="/admin/bookings/<%= b.id %>">#<%= b.id %></a></td><td><%= b.destination %></td><td><%= b.supplier || '' %></td><td><%= b.confirmation_number || '' %></td><td><span class="pill <%= statusClass(b.booking_status) %>"><%= b.booking_status %></span></td></tr><% }) %>
+      <% if (!bookings.length) { %><tr><td colspan="5" class="muted">No bookings.</td></tr><% } %></table></div>
+    <div class="card"><h2>Communication</h2><table><% comms.forEach(function (m) { %><tr><td class="small nowrap"><%= fmtDateTime(m.created_at) %></td><td><%= m.direction %></td><td><% if (m.direction === 'Outgoing') { %><a href="/admin/communications/<%= m.id %>"><%= m.subject %></a><% } else { %><%= m.body %><% } %></td><td><span class="pill <%= statusClass(m.status) %>"><%= m.status %></span></td></tr><% }) %></table></div>
+  </div>
+  <div>
+    <form class="card" method="post"><input type="hidden" name="_csrf" value="<%= csrf %>">
+      <h2>Contact information</h2>
+      <div class="fr one"><div><label>Name</label><input type="text" name="name" value="<%= c.name %>"></div></div>
+      <div class="fr one"><div><label>Email</label><input type="email" name="email" value="<%= c.email %>"></div></div>
+      <div class="fr one"><div><label>Phone</label><input type="text" name="phone" value="<%= c.phone || '' %>"></div></div>
+      <div class="fr one"><div><label>Private notes</label><textarea name="internal_notes"><%= c.internal_notes || '' %></textarea></div></div>
+      <button class="btn primary">Save</button>
+    </form>
+    <div class="card"><h2>Travel preferences</h2><dl class="kv" style="grid-template-columns:100px 1fr">
+      <dt>Style</dt><dd><%= c.prefs.vacation_style || '—' %></dd><dt>Hotels</dt><dd><%= (c.prefs.hotel_prefs || []).join(', ') || '—' %></dd>
+      <dt>Experiences</dt><dd><%= (c.prefs.experiences || []).join(', ') || '—' %></dd><dt>Flights</dt><dd><%= c.prefs.flight_pref || '—' %></dd></dl>
+      <p class="muted small">From their latest request.</p></div>
+  </div>
+</div>
+<%- include('_foot') %>

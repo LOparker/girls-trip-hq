@@ -1,0 +1,6 @@
+<%- include('_head') %>
+<div class="topline"><h1>Customers</h1><form method="get" class="btn-row"><input type="text" name="q" value="<%= q || '' %>" placeholder="Search name, email, phone" style="width:260px"><button class="btn">Search</button></form></div>
+<div class="card table-wrap"><table><tr><th>Name</th><th>Email</th><th>Phone</th><th>Trips</th><th>Since</th></tr>
+  <% list.forEach(function (c) { %><tr><td><a href="/admin/customers/<%= c.id %>"><%= c.name %></a></td><td><%= c.email %></td><td><%= c.phone || '' %></td><td><%= c.trips %></td><td><%= fmtDate(c.created_at) %></td></tr><% }) %>
+  <% if (!list.length) { %><tr><td colspan="5" class="muted">No customers yet.</td></tr><% } %></table></div>
+<%- include('_foot') %>

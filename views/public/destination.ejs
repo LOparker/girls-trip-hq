@@ -1,0 +1,56 @@
+<%- include('../partials/header') %>
+<section class="page-hero" style="padding:200px 0 80px">
+  <div class="bg" style="background-image:url('<%= d.image.replace('w=1600', 'w=2200') %>')"></div>
+  <div class="wrap">
+    <span class="eyebrow" style="color:#f1d7b3"><%= d.region %></span>
+    <h1><%= d.name %></h1>
+    <p><%= d.summary %></p>
+  </div>
+</section>
+<section class="section">
+  <div class="wrap detail-grid">
+    <div>
+      <div class="block reveal">
+        <span class="eyebrow">Things to do</span>
+        <h2>Experiences worth planning around</h2>
+        <ul class="ticks"><% d.thingsToDo.forEach(function (t) { %><li><%= t %></li><% }) %></ul>
+      </div>
+      <div class="grid g2 block reveal">
+        <div><h3>Popular hotels</h3><ul class="ticks"><% d.hotels.forEach(function (t) { %><li><%= t %></li><% }) %></ul></div>
+        <div><h3>Resorts</h3><ul class="ticks"><% d.resorts.forEach(function (t) { %><li><%= t %></li><% }) %></ul></div>
+        <div><h3>Where to eat</h3><ul class="ticks"><% d.restaurants.forEach(function (t) { %><li><%= t %></li><% }) %></ul></div>
+        <div><h3>Excursions</h3><ul class="ticks"><% d.excursions.forEach(function (t) { %><li><%= t %></li><% }) %></ul></div>
+      </div>
+      <div class="block reveal">
+        <h3>Getting there and around</h3>
+        <p><%= d.transport %></p>
+      </div>
+      <div class="block reveal">
+        <h3>Travel tips</h3>
+        <ul class="ticks"><% d.tips.forEach(function (t) { %><li><%= t %></li><% }) %></ul>
+        <p class="muted small">Entry requirements change. Always check official government sources before you travel.</p>
+      </div>
+      <div class="block" id="packages">
+        <span class="eyebrow">Vacation packages</span>
+        <h2><%= d.name %> packages</h2>
+        <% if (packages.length) { %>
+          <div class="grid g2"><% packages.forEach(function (p) { %><%- include('../partials/package-card', { p: p, compare: false }) %><% }) %></div>
+        <% } else { %>
+          <p class="muted">We build <%= d.name %> packages around your dates, departure city and budget. Request a custom quote and your agent will put together a few options for you.</p>
+        <% } %>
+      </div>
+    </div>
+    <aside class="aside-card">
+      <h3 style="margin-bottom:4px">Plan your <%= d.name %> trip</h3>
+      <p class="muted small">Free, personalized research from a real travel agent.</p>
+      <ul class="info-list" style="margin-bottom:18px">
+        <li><span>Best time to go</span><span><%= d.season.split(';')[0] %></span></li>
+        <li><span>Highlights</span><span><%= d.attractions.slice(0, 2).join(', ') %></span></li>
+        <li><span>Starting price</span><span><%= d.verifiedFrom ? money(d.verifiedFrom.amount) + ' pp' : 'Quoted for your dates' %></span></li>
+      </ul>
+      <a href="/plan?destination=<%= encodeURIComponent(d.name) %>" class="btn btn-gold btn-block">Plan My <%= d.name %> Vacation</a>
+      <a href="/inquiry?destination=<%= encodeURIComponent(d.name) %>" class="btn btn-outline btn-block" style="margin-top:10px">Detailed custom inquiry</a>
+    </aside>
+  </div>
+</section>
+<%- include('../partials/footer') %>

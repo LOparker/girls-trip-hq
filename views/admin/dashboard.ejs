@@ -1,0 +1,33 @@
+<%- include('_head') %>
+<div class="topline"><div><h1>Good to see you, <%= user.name.split(' ')[0] %></h1><div class="sub">Here is where every trip stands today.</div></div>
+  <div class="btn-row"><a class="btn" href="/admin/communications?status=Draft">Drafts to review (<%= drafts %>)</a><a class="btn primary" href="/admin/packages/new">New package</a></div></div>
+<div class="grid g4" style="margin-bottom:20px">
+  <% stats.forEach(function (s) { %><a class="stat" href="/admin/requests?status=<%= encodeURIComponent(s[2]) %>"><strong><%= s[1] %></strong><span><%= s[0] %></span></a><% }) %>
+</div>
+<div class="cols">
+  <div>
+    <div class="card">
+      <h2>Latest trip requests</h2>
+      <div class="table-wrap"><table>
+        <tr><th>Ref</th><th>Customer</th><th>Destination</th><th>Dates</th><th>Status</th></tr>
+        <% recent.forEach(function (r) { %><tr><td><a href="/admin/requests/<%= r.id %>"><%= r.ref_code %></a></td><td><%= r.customer_name %></td><td><%= r.destination || 'Open' %></td>
+          <td class="nowrap"><%= fmtDate(r.depart_date) %></td><td><span class="pill <%= statusClass(r.status) %>"><%= r.status %></span></td></tr><% }) %>
+        <% if (!recent.length) { %><tr><td colspan="5" class="muted">No requests yet. They appear here as soon as a customer submits the trip form.</td></tr><% } %>
+      </table></div>
+    </div>
+    <div class="card">
+      <h2>Upcoming departures</h2>
+      <table><tr><th>Departs</th><th>Customer</th><th>Destination</th><th>Confirmation</th></tr>
+        <% upcoming.forEach(function (b) { %><tr><td><%= fmtDate(b.travel_start) %></td><td><%= b.customer_name %></td><td><%= b.destination %></td><td><a href="/admin/bookings/<%= b.id %>"><%= b.confirmation_number %></a></td></tr><% }) %>
+        <% if (!upcoming.length) { %><tr><td colspan="4" class="muted">No confirmed upcoming trips.</td></tr><% } %>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Recent activity</h2>
+    <ul class="timeline"><% notes.forEach(function (n) { %><li><% if (n.link) { %><a href="<%= n.link %>"><%= n.message %></a><% } else { %><%= n.message %><% } %><div class="muted small"><%= fmtDateTime(n.created_at) %></div></li><% }) %>
+      <% if (!notes.length) { %><li class="muted">Nothing yet.</li><% } %></ul>
+    <a class="small" href="/admin/notifications">All notifications</a>
+  </div>
+</div>
+<%- include('_foot') %>

@@ -1,0 +1,31 @@
+<%- include('../partials/header') %>
+<section class="plain-hero"><div class="wrap"><span class="eyebrow">Contact</span><h1 style="font-size:clamp(2rem,4vw,3.2rem)">Contact Us</h1><p class="lead">Questions, ideas or a trip already in mind? We would love to hear from you.</p></div></section>
+<section class="section tight">
+  <div class="wrap detail-grid">
+    <form class="form-card" method="post" action="/contact">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <div class="hp" aria-hidden="true"><label>Leave empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <% if (sent) { %><div class="alert alert-ok">Thank you. Your message was received and we will get back to you within one business day.</div><% } %>
+      <% if (errors) { %><div class="alert alert-error"><%= errors.join(' ') %></div><% } %>
+      <div class="form-row two" style="margin-top:0">
+        <div><label for="c-n">Name *</label><input type="text" id="c-n" name="name" value="<%= q.name || '' %>" required></div>
+        <div><label for="c-e">Email *</label><input type="email" id="c-e" name="email" value="<%= q.email || '' %>" required></div>
+        <div><label for="c-p">Phone</label><input type="tel" id="c-p" name="phone" value="<%= q.phone || '' %>"></div>
+        <div><label for="c-s">Subject</label><input type="text" id="c-s" name="subject" value="<%= q.subject || '' %>"></div>
+      </div>
+      <div style="margin-top:16px"><label for="c-m">Message *</label><textarea id="c-m" name="message" required><%= q.message || '' %></textarea></div>
+      <button class="btn btn-primary" style="margin-top:20px" type="submit">Send message</button>
+    </form>
+    <aside class="aside-card">
+      <h3>Talk to an agent</h3>
+      <ul class="info-list">
+        <li><span>Phone</span><span><a href="tel:<%= brand.phone.replace(/[^0-9+]/g, '') %>"><%= brand.phone %></a></span></li>
+        <li><span>Email</span><span><a href="mailto:<%= brand.email %>"><%= brand.email %></a></span></li>
+        <li><span>Hours</span><span><%= brand.hours %></span></li>
+        <li><span>Based in</span><span><%= brand.city %></span></li>
+      </ul>
+      <p class="small muted" style="margin-top:16px">Ready to plan? The <a href="/plan">trip planner</a> is the fastest way to get a proposal.</p>
+    </aside>
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,23 @@
+<article class="card reveal">
+  <a href="/packages/<%= p.id %>" class="card-img" style="background-image:url('<%= (p.images && p.images[0]) || '' %>')" aria-label="<%= p.name %>">
+    <span class="tag"><%= PACKAGE_CATEGORIES[p.category] || 'Vacation Package' %></span>
+    <% if (p.is_sample) { %><span class="tag sample">Sample</span><% } %>
+  </a>
+  <div class="card-body">
+    <div class="card-meta"><span><%= p.destination_name %></span><% if (p.nights) { %><span><%= p.nights %> nights</span><% } %></div>
+    <h3><a href="/packages/<%= p.id %>"><%= p.name %></a></h3>
+    <p class="muted small"><%= p.summary %></p>
+    <div class="card-foot">
+      <div class="price">
+        <% if (p.is_sample) { %><span style="font-size:1.1rem">Sample package</span><small>Illustration only, not a live price</small>
+        <% } else if (p.estimated_price_pp) { %>From <%= money(p.estimated_price_pp) %><small><%= p.price_type %> per person<% if (p.pricing_checked_at) { %>, checked <%= fmtDate(p.pricing_checked_at) %><% } %></small>
+        <% } else { %><span style="font-size:1.2rem">Price on request</span><% } %>
+      </div>
+      <% if (typeof compare !== 'undefined' && compare) { %>
+        <label class="check compare-toggle"><input type="checkbox" value="<%= p.id %>" data-compare> Compare</label>
+      <% } else { %>
+        <a href="/packages/<%= p.id %>" class="btn btn-outline btn-sm">View</a>
+      <% } %>
+    </div>
+  </div>
+</article>

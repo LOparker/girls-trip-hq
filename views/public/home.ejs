@@ -1,0 +1,92 @@
+<%- include('../partials/header') %>
+<section class="hero">
+  <div class="hero-img" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2200&q=80')"></div>
+  <div class="wrap">
+    <span class="eyebrow" style="color:#f1d7b3">Personally planned vacations</span>
+    <h1>Your Next Getaway Starts Here.</h1>
+    <p>From tropical escapes to unforgettable adventures, we'll help you find the perfect vacation. Tell us where you want to go, and we'll take care of the details.</p>
+    <div class="actions">
+      <a href="/destinations" class="btn btn-light">Explore Destinations</a>
+      <a href="/plan" class="btn btn-ghost">Plan My Vacation</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><%- include('../partials/quick-search') %></div>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head" style="display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap">
+      <div>
+        <span class="eyebrow">Where to next</span>
+        <h2>Destinations our travelers love</h2>
+        <p class="lead" style="margin:0">Caribbean beaches, European cities and once in a lifetime journeys. Every trip is planned around you.</p>
+      </div>
+      <a href="/destinations" class="btn btn-outline">All destinations</a>
+    </div>
+    <div class="grid g4">
+      <% featured.forEach(function (d) { %>
+      <a href="/destinations/<%= d.slug %>" class="card dest-card reveal">
+        <div class="card-img" style="background-image:url('<%= d.image.replace('w=1600', 'w=800') %>')">
+          <div class="overlay"><h3><%= d.name %></h3><span><%= d.attractions.slice(0, 2).join(' · ') %></span></div>
+        </div>
+      </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section sand">
+  <div class="wrap split">
+    <div class="reveal">
+      <span class="eyebrow">How it works</span>
+      <h2>A real travel agent, with research that never sleeps</h2>
+      <p class="lead">We compare airline vacation packages, online travel sites and booking flights and hotels separately, so you see the options that actually fit your budget and style.</p>
+      <div class="grid" style="gap:22px; margin-top:30px">
+        <div class="feature"><span class="num">1</span><div><h4>Tell us your dream trip</h4><p class="muted" style="margin:0">Destination, dates, budget and the little things that matter to you.</p></div></div>
+        <div class="feature"><span class="num">2</span><div><h4>We research and compare</h4><p class="muted" style="margin:0">Bundled packages, individual flights and resorts, total costs including taxes and fees.</p></div></div>
+        <div class="feature"><span class="num">3</span><div><h4>You choose your favorite</h4><p class="muted" style="margin:0">A personalized proposal with hand picked options side by side.</p></div></div>
+        <div class="feature"><span class="num">4</span><div><h4>We book and confirm</h4><p class="muted" style="margin:0">Your agent personally confirms availability and pricing, then books it for you.</p></div></div>
+      </div>
+    </div>
+    <img class="reveal" src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1100&q=80" alt="Resort pool overlooking the ocean at sunset" loading="lazy">
+  </div>
+</section>
+
+<% if (packages.length) { %>
+<section class="section">
+  <div class="wrap">
+    <div class="section-head center">
+      <span class="eyebrow">Vacation packages</span>
+      <h2>Ideas to start your planning</h2>
+      <p class="lead">Every package is tailored to your dates and departure city. Your agent confirms current pricing before anything is booked.</p>
+    </div>
+    <div class="grid g3"><% packages.forEach(function (p) { %><%- include('../partials/package-card', { p: p, compare: false }) %><% }) %></div>
+    <div class="center" style="margin-top:36px"><a href="/packages" class="btn btn-outline">Browse all packages</a></div>
+  </div>
+</section>
+<% } %>
+
+<section class="section sand">
+  <div class="wrap">
+    <div class="section-head center">
+      <span class="eyebrow">Why plan with us</span>
+      <h2>The care of an agent, the reach of the whole market</h2>
+    </div>
+    <div class="grid g3">
+      <div class="reveal"><h3>Honest comparisons</h3><p class="muted">We do not assume the cheapest flight plus the cheapest hotel is the best deal. We add up the full cost, including bags, resort fees and transfers.</p></div>
+      <div class="reveal"><h3>One person who knows your trip</h3><p class="muted">You work with a dedicated agent from the first question to the welcome home message. No call centers.</p></div>
+      <div class="reveal"><h3>Nothing booked without you</h3><p class="muted">You approve every option. Your agent confirms availability and the final price with you before reserving anything.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="cta-band">
+      <div><h2>Not sure where to go?</h2><p>Tell us what you are in the mood for and we will suggest a few places you will love.</p></div>
+      <a href="/plan?destination_flexible=1" class="btn btn-gold">Help me choose</a>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

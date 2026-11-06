@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title><%= title %> · Dashboard · <%= brand.shortName %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+<% if (user) { var on = function (p) { return adminPath === p || (p !== '/' && adminPath.indexOf(p) === 0) ? 'on' : ''; }; %>
+<div class="layout">
+  <aside class="side">
+    <a class="brand" href="/admin"><%= brand.shortName %><small>Agent dashboard</small></a>
+    <nav>
+      <a href="/admin" class="<%= adminPath === '/' ? 'on' : '' %>">Overview</a>
+      <a href="/admin/notifications" class="<%= on('/notifications') %>">Notifications <% if (unread) { %><span class="badge"><%= unread %></span><% } %></a>
+      <div class="sec">Work</div>
+      <a href="/admin/requests" class="<%= on('/requests') %>">Trip requests</a>
+      <a href="/admin/research" class="<%= on('/research') %>">AI travel research</a>
+      <a href="/admin/proposals" class="<%= on('/proposals') %>">Proposals</a>
+      <a href="/admin/bookings" class="<%= on('/bookings') %>">Bookings</a>
+      <a href="/admin/communications" class="<%= on('/communications') %>">Communications</a>
+      <div class="sec">Manage</div>
+      <a href="/admin/customers" class="<%= on('/customers') %>">Customers</a>
+      <a href="/admin/packages" class="<%= on('/packages') %>">Packages</a>
+      <a href="/admin/providers" class="<%= on('/providers') %>">Travel providers</a>
+      <a href="/admin/messages" class="<%= on('/messages') %>">Contact messages</a>
+      <% if (user.role === 'owner') { %><a href="/admin/users" class="<%= on('/users') %>">Team</a><% } %>
+      <div class="sec">Account</div>
+      <a href="/admin/account" class="<%= on('/account') %>"><%= user.name %></a>
+      <a href="/" target="_blank">View website</a>
+      <form method="post" action="/admin/logout" style="margin:6px 10px"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn small" type="submit">Sign out</button></form>
+    </nav>
+  </aside>
+  <main class="main">
+    <% if (flash) { %><div class="flash <%= flash.kind %>"><%= flash.msg %></div><% } %>
+<% } else { %>
+<main>
+<% } %>
